@@ -55,7 +55,8 @@ $conf['master_modules']['base'] = array(
   'views_bulk_operations',
 
   // Custom modules.
-  'manatime_clients',
+  'manatime_feature_clients',
+  'manatime_feature_field_bases',
 );
 
 // Local environment.
