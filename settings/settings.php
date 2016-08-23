@@ -54,7 +54,7 @@ $conf['master_modules']['base'] = array(
   'views',
   'views_bulk_operations',
 
-  //Custom modules
+  // Custom modules.
   'manatime_clients',
 );
 
