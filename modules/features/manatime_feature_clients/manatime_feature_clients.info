@@ -1,4 +1,4 @@
-name = manatime_feature_clients
+name = Manatime clients feature
 description = Content type clients.
 core = 7.x
 package = manatime
