@@ -87,8 +87,6 @@ deploy:
         code: |
             apt-get update -y
             apt-get install -y build-essential curl wget git php5-curl unzip php5-mysql php5-gd ssh-client openssh-client keychain
-    - add-ssh-key:
-        keyname: DEPLOYMENT_KEY
     - script:
         name: Install other dependencies
         code: |
@@ -142,8 +140,6 @@ deploy-test:
         code: |
             apt-get update -y
             apt-get install -y build-essential curl wget git php5-curl unzip php5-mysql php5-gd ssh-client openssh-client keychain
-    - add-ssh-key:
-        keyname: DEPLOYMENT_KEY
     - script:
         name: Install other dependencies
         code: |
@@ -194,8 +190,6 @@ deploy-live:
         code: |
             apt-get update -y
             apt-get install -y build-essential curl wget git php5-curl unzip php5-mysql php5-gd ssh-client openssh-client keychain
-    - add-ssh-key:
-        keyname: DEPLOYMENT_KEY
     - script:
         name: Install other dependencies
         code: |
@@ -245,8 +239,6 @@ deploy-multidev:
         code: |
             apt-get update -y
             apt-get install -y build-essential curl wget git php5-curl unzip php5-mysql php5-gd ssh-client openssh-client keychain
-    - add-ssh-key:
-        keyname: DEPLOYMENT_KEY
     - script:
         name: Install other dependencies
         code: |
