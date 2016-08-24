@@ -265,7 +265,7 @@ deploy-multidev:
             npm install -g aquifer aquifer-git
             NEWBRANCH=$WERCKER_GIT_BRANCH
             LENGTH=${#NEWBRANCH}
-            if [ LENGTH > 10 ] ; then NEWBRANCH=${NEWBRANCH:8:6} ; fi
+            if [ LENGTH > 10 ] ; then NEWBRANCH=${NEWBRANCH:8:11} ; fi
             NEWBRANCH=${NEWBRANCH//-/}
             NEWBRANCH=${NEWBRANCH,,}
             aquifer deploy-git -m "Auto deploy triggered from $WERCKER_GIT_BRANCH branch" -b $NEWBRANCH
