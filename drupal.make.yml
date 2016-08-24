@@ -47,6 +47,8 @@ projects:
     version: ""
   fences:
     version: ""
+  inline_entity_form:
+    version: ""
   libraries:
     version: ""
   link:
