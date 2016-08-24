@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the manatime_feature_clients feature.
+ */
+
+include_once 'manatime_feature_clients.features.inc';

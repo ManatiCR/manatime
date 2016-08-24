@@ -1,4 +1,6 @@
 box: linode/lamp
+no-response-timeout: 10
+command-timeout: 10
 build:
     steps:
     - script:
@@ -91,7 +93,6 @@ deploy:
         name: Install other dependencies
         code: |
             eval `ssh-agent`
-            ssh-add /tmp/tmp.*
             wget -q https://deb.nodesource.com/setup_4.x
             chmod +x setup_4.x
             ./setup_4.x
@@ -144,7 +145,6 @@ deploy-test:
         name: Install other dependencies
         code: |
             eval `ssh-agent`
-            ssh-add /tmp/tmp.*
             wget -q https://deb.nodesource.com/setup_4.x
             chmod +x setup_4.x
             ./setup_4.x
@@ -194,7 +194,6 @@ deploy-live:
         name: Install other dependencies
         code: |
             eval `ssh-agent`
-            ssh-add /tmp/tmp.*
             wget -q https://deb.nodesource.com/setup_4.x
             chmod +x setup_4.x
             ./setup_4.x
@@ -243,7 +242,6 @@ deploy-multidev:
         name: Install other dependencies
         code: |
             eval `ssh-agent`
-            ssh-add /tmp/tmp.*
             wget -q https://deb.nodesource.com/setup_4.x
             chmod +x setup_4.x
             ./setup_4.x

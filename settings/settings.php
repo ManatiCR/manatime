@@ -53,6 +53,10 @@ $conf['master_modules']['base'] = array(
   'token',
   'views',
   'views_bulk_operations',
+
+  // Custom modules.
+  'manatime_feature_clients',
+  'manatime_feature_field_bases',
 );
 
 // Local environment.
