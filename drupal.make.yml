@@ -52,7 +52,7 @@ projects:
   link:
     version: "1.4"
   master:
-    version: "2.0"
+    version: "2.0-beta4"
   module_filter:
     version: "2.0"
   pathauto:
