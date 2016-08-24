@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * manatime_clients.features.field_instance.inc
+ * manatime_feature_clients.features.field_instance.inc
  */
 
 /**
