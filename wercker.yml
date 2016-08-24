@@ -89,10 +89,13 @@ deploy:
         code: |
             apt-get update -y
             apt-get install -y build-essential curl wget git php5-curl unzip php5-mysql php5-gd ssh-client openssh-client keychain
+    - add-ssh-key:
+        keyname: DEPLOYMENT_KEY
     - script:
         name: Install other dependencies
         code: |
             eval `ssh-agent`
+            ssh-add /tmp/tmp.*
             wget -q https://deb.nodesource.com/setup_4.x
             chmod +x setup_4.x
             ./setup_4.x
@@ -141,10 +144,13 @@ deploy-test:
         code: |
             apt-get update -y
             apt-get install -y build-essential curl wget git php5-curl unzip php5-mysql php5-gd ssh-client openssh-client keychain
+    - add-ssh-key:
+        keyname: DEPLOYMENT_KEY
     - script:
         name: Install other dependencies
         code: |
             eval `ssh-agent`
+            ssh-add /tmp/tmp.*
             wget -q https://deb.nodesource.com/setup_4.x
             chmod +x setup_4.x
             ./setup_4.x
@@ -190,10 +196,13 @@ deploy-live:
         code: |
             apt-get update -y
             apt-get install -y build-essential curl wget git php5-curl unzip php5-mysql php5-gd ssh-client openssh-client keychain
+    - add-ssh-key:
+        keyname: DEPLOYMENT_KEY
     - script:
         name: Install other dependencies
         code: |
             eval `ssh-agent`
+            ssh-add /tmp/tmp.*
             wget -q https://deb.nodesource.com/setup_4.x
             chmod +x setup_4.x
             ./setup_4.x
@@ -238,10 +247,13 @@ deploy-multidev:
         code: |
             apt-get update -y
             apt-get install -y build-essential curl wget git php5-curl unzip php5-mysql php5-gd ssh-client openssh-client keychain
+    - add-ssh-key:
+        keyname: DEPLOYMENT_KEY
     - script:
         name: Install other dependencies
         code: |
             eval `ssh-agent`
+            ssh-add /tmp/tmp.*
             wget -q https://deb.nodesource.com/setup_4.x
             chmod +x setup_4.x
             ./setup_4.x
