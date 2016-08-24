@@ -1,4 +1,4 @@
-name = manatime_feature_field_bases
+name = Manatime field bases
 core = 7.x
 package = manatime
 version = 7.x-7.0
