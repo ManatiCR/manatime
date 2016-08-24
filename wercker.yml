@@ -1,4 +1,6 @@
 box: linode/lamp
+no-response-timeout: 10
+command-timeout: 10
 build:
     steps:
     - script:
