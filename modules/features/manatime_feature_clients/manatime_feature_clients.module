@@ -5,3 +5,15 @@
  */
 
 include_once 'manatime_feature_clients.features.inc';
+
+/**
+ * Implements hook_permission().
+ */
+function manatime_feature_clients_permission() {
+  return array(
+    'manage clients' => array(
+      'title' => t('Manage clients'),
+      'description' => t('Allow add, archive and edit clients.'),
+    ),
+  );
+}
