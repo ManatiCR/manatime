@@ -77,10 +77,10 @@ function manatime_feature_projects_views_default_views() {
     1 => '1',
   );
 
-  /* Display: Active projects */
-  $handler = $view->new_display('page', 'Active projects', 'page');
+  /* Display: Active Projects */
+  $handler = $view->new_display('page', 'Active Projects', 'page');
   $handler->display->display_options['defaults']['title'] = FALSE;
-  $handler->display->display_options['title'] = 'Active projects';
+  $handler->display->display_options['title'] = 'Active Projects';
   $handler->display->display_options['path'] = 'projects/active';
   $handler->display->display_options['menu']['type'] = 'default tab';
   $handler->display->display_options['menu']['title'] = 'Active Projects';
@@ -92,10 +92,10 @@ function manatime_feature_projects_views_default_views() {
   $handler->display->display_options['tab_options']['weight'] = '0';
   $handler->display->display_options['tab_options']['name'] = 'main-menu';
 
-  /* Display: Inactive projects */
-  $handler = $view->new_display('page', 'Inactive projects', 'page_1');
+  /* Display: Inactive Projects */
+  $handler = $view->new_display('page', 'Inactive Projects', 'page_1');
   $handler->display->display_options['defaults']['title'] = FALSE;
-  $handler->display->display_options['title'] = 'Inactive projects';
+  $handler->display->display_options['title'] = 'Inactive Projects';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
   /* Filter criterion: Content: Published */
