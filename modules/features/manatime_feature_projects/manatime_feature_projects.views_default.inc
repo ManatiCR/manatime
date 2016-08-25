@@ -1,50 +1,37 @@
 <?php
 /**
  * @file
- * manatime_feature_clients.views_default.inc
+ * manatime_feature_projects.views_default.inc
  */
 
 /**
  * Implements hook_views_default_views().
  */
-function manatime_feature_clients_views_default_views() {
+function manatime_feature_projects_views_default_views() {
   $export = array();
 
   $view = new view();
-  $view->name = 'clients_listing';
+  $view->name = 'projects_listing';
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'node';
-  $view->human_name = 'Clients listing';
+  $view->human_name = 'Projects Listing';
   $view->core = 7;
   $view->api_version = '3.0';
   $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 
   /* Display: Master */
   $handler = $view->new_display('default', 'Master', 'default');
-  $handler->display->display_options['title'] = 'Inactive Clients';
+  $handler->display->display_options['title'] = 'Projects Listing';
   $handler->display->display_options['use_more_always'] = FALSE;
   $handler->display->display_options['access']['type'] = 'perm';
-  $handler->display->display_options['access']['perm'] = 'manage clients';
+  $handler->display->display_options['access']['perm'] = 'manage projects';
   $handler->display->display_options['cache']['type'] = 'none';
   $handler->display->display_options['query']['type'] = 'views_query';
   $handler->display->display_options['exposed_form']['type'] = 'basic';
   $handler->display->display_options['pager']['type'] = 'full';
-  $handler->display->display_options['pager']['options']['items_per_page'] = '25';
+  $handler->display->display_options['pager']['options']['items_per_page'] = '10';
   $handler->display->display_options['style_plugin'] = 'table';
-  $handler->display->display_options['style_options']['columns'] = array(
-    'title' => 'title',
-  );
-  $handler->display->display_options['style_options']['default'] = '-1';
-  $handler->display->display_options['style_options']['info'] = array(
-    'title' => array(
-      'sortable' => 0,
-      'default_sort_order' => 'asc',
-      'align' => '',
-      'separator' => '',
-      'empty_column' => 0,
-    ),
-  );
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -52,11 +39,23 @@ function manatime_feature_clients_views_default_views() {
   $handler->display->display_options['fields']['title']['label'] = 'Name';
   $handler->display->display_options['fields']['title']['alter']['word_boundary'] = FALSE;
   $handler->display->display_options['fields']['title']['alter']['ellipsis'] = FALSE;
+  /* Field: Content: Clients */
+  $handler->display->display_options['fields']['field_client']['id'] = 'field_client';
+  $handler->display->display_options['fields']['field_client']['table'] = 'field_data_field_client';
+  $handler->display->display_options['fields']['field_client']['field'] = 'field_client';
+  $handler->display->display_options['fields']['field_client']['label'] = 'Client';
+  $handler->display->display_options['fields']['field_client']['element_label_colon'] = FALSE;
+  $handler->display->display_options['fields']['field_client']['element_wrapper_type'] = '0';
+  $handler->display->display_options['fields']['field_client']['element_default_classes'] = FALSE;
+  $handler->display->display_options['fields']['field_client']['settings'] = array(
+    'link' => 0,
+  );
+  $handler->display->display_options['fields']['field_client']['field_api_classes'] = TRUE;
   /* Field: Content: Edit link */
   $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
   $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
   $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
-  $handler->display->display_options['fields']['edit_node']['label'] = 'Edit client';
+  $handler->display->display_options['fields']['edit_node']['label'] = 'Edit project';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -74,20 +73,35 @@ function manatime_feature_clients_views_default_views() {
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
-    'clients' => 'clients',
+    'projects' => 'projects',
   );
   /* Filter criterion: Content: Active (field_active) */
   $handler->display->display_options['filters']['field_active_value']['id'] = 'field_active_value';
   $handler->display->display_options['filters']['field_active_value']['table'] = 'field_data_field_active';
   $handler->display->display_options['filters']['field_active_value']['field'] = 'field_active_value';
   $handler->display->display_options['filters']['field_active_value']['value'] = array(
-    0 => '0',
+    1 => '1',
   );
 
-  /* Display: Active client */
-  $handler = $view->new_display('page', 'Active client', 'page');
+  /* Display: Active Projects */
+  $handler = $view->new_display('page', 'Active Projects', 'page');
   $handler->display->display_options['defaults']['title'] = FALSE;
-  $handler->display->display_options['title'] = 'Active Clients';
+  $handler->display->display_options['title'] = 'Active Projects';
+  $handler->display->display_options['path'] = 'projects/active';
+  $handler->display->display_options['menu']['type'] = 'default tab';
+  $handler->display->display_options['menu']['title'] = 'Active Projects';
+  $handler->display->display_options['menu']['weight'] = '0';
+  $handler->display->display_options['menu']['context'] = 0;
+  $handler->display->display_options['menu']['context_only_inline'] = 0;
+  $handler->display->display_options['tab_options']['type'] = 'normal';
+  $handler->display->display_options['tab_options']['title'] = 'Projects';
+  $handler->display->display_options['tab_options']['weight'] = '0';
+  $handler->display->display_options['tab_options']['name'] = 'main-menu';
+
+  /* Display: Inactive Projects */
+  $handler = $view->new_display('page', 'Inactive Projects', 'page_1');
+  $handler->display->display_options['defaults']['title'] = FALSE;
+  $handler->display->display_options['title'] = 'Inactive Projects';
   $handler->display->display_options['defaults']['filter_groups'] = FALSE;
   $handler->display->display_options['defaults']['filters'] = FALSE;
   /* Filter criterion: Content: Published */
@@ -102,36 +116,22 @@ function manatime_feature_clients_views_default_views() {
   $handler->display->display_options['filters']['type']['table'] = 'node';
   $handler->display->display_options['filters']['type']['field'] = 'type';
   $handler->display->display_options['filters']['type']['value'] = array(
-    'clients' => 'clients',
+    'projects' => 'projects',
   );
   /* Filter criterion: Content: Active (field_active) */
   $handler->display->display_options['filters']['field_active_value']['id'] = 'field_active_value';
   $handler->display->display_options['filters']['field_active_value']['table'] = 'field_data_field_active';
   $handler->display->display_options['filters']['field_active_value']['field'] = 'field_active_value';
   $handler->display->display_options['filters']['field_active_value']['value'] = array(
-    1 => '1',
+    0 => '0',
   );
-  $handler->display->display_options['path'] = 'clients/active';
-  $handler->display->display_options['menu']['type'] = 'default tab';
-  $handler->display->display_options['menu']['title'] = 'Active Clients';
-  $handler->display->display_options['menu']['weight'] = '0';
-  $handler->display->display_options['menu']['context'] = 0;
-  $handler->display->display_options['menu']['context_only_inline'] = 0;
-  $handler->display->display_options['tab_options']['type'] = 'normal';
-  $handler->display->display_options['tab_options']['title'] = 'Clients';
-  $handler->display->display_options['tab_options']['weight'] = '0';
-  $handler->display->display_options['tab_options']['name'] = 'main-menu';
-
-  /* Display: Inactive client */
-  $handler = $view->new_display('page', 'Inactive client', 'page_1');
-  $handler->display->display_options['path'] = 'clients/inactive';
+  $handler->display->display_options['path'] = 'projects/inactive';
   $handler->display->display_options['menu']['type'] = 'tab';
-  $handler->display->display_options['menu']['title'] = 'Inactive Clients';
+  $handler->display->display_options['menu']['title'] = 'Inactive Projects';
   $handler->display->display_options['menu']['weight'] = '0';
-  $handler->display->display_options['menu']['name'] = 'main-menu';
   $handler->display->display_options['menu']['context'] = 0;
   $handler->display->display_options['menu']['context_only_inline'] = 0;
-  $export['clients_listing'] = $view;
+  $export['projects_listing'] = $view;
 
   return $export;
 }
