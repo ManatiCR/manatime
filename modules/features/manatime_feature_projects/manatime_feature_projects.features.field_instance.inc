@@ -125,7 +125,7 @@ function manatime_feature_projects_field_default_field_instances() {
     'entity_type' => 'node',
     'fences_wrapper' => 'div',
     'field_name' => 'field_client',
-    'label' => 'Client',
+    'label' => 'Clients',
     'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
@@ -137,7 +137,7 @@ function manatime_feature_projects_field_default_field_instances() {
         'fields' => array(),
         'type_settings' => array(
           'allow_clone' => 0,
-          'allow_existing' => 0,
+          'allow_existing' => 1,
           'allow_new' => 1,
           'delete_references' => 0,
           'label_plural' => 'nodes',
@@ -154,7 +154,7 @@ function manatime_feature_projects_field_default_field_instances() {
   // Translatables
   // Included for use with string extractors like potx.
   t('Active');
-  t('Client');
+  t('Clients');
   t('Description');
 
   return $field_instances;
