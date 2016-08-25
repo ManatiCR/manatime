@@ -1,7 +1,7 @@
 name = Manatime field bases
 core = 7.x
 package = manatime
-version = 7.x-1.1
+version = 7.x-1.2
 dependencies[] = entityreference
 dependencies[] = features
 dependencies[] = list
@@ -9,5 +9,7 @@ dependencies[] = text
 features[features_api][] = api:2
 features[field_base][] = body
 features[field_base][] = field_active
+features[field_base][] = field_billable
 features[field_base][] = field_client
+features[field_base][] = field_project
 project path = sites/all/modules/features
