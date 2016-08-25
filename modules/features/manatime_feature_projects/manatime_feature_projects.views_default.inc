@@ -42,7 +42,6 @@ function manatime_feature_projects_views_default_views() {
   $handler->display->display_options['fields']['field_client']['id'] = 'field_client';
   $handler->display->display_options['fields']['field_client']['table'] = 'field_data_field_client';
   $handler->display->display_options['fields']['field_client']['field'] = 'field_client';
-  $handler->display->display_options['fields']['field_client']['label'] = '';
   $handler->display->display_options['fields']['field_client']['element_label_colon'] = FALSE;
   $handler->display->display_options['fields']['field_client']['element_wrapper_type'] = '0';
   $handler->display->display_options['fields']['field_client']['element_default_classes'] = FALSE;
@@ -50,6 +49,11 @@ function manatime_feature_projects_views_default_views() {
     'link' => 0,
   );
   $handler->display->display_options['fields']['field_client']['field_api_classes'] = TRUE;
+  /* Field: Content: Edit link */
+  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
+  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
+  $handler->display->display_options['fields']['edit_node']['label'] = 'Edit projects';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
