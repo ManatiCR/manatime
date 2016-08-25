@@ -59,6 +59,7 @@ $conf['master_modules']['base'] = array(
   'manatime_feature_field_bases',
   'manatime_feature_projects',
   'manatime_feature_tasks',
+  'manatime_feature_users',
 );
 
 // Local environment.
