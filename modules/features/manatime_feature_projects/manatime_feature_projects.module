@@ -5,3 +5,15 @@
  */
 
 include_once 'manatime_feature_projects.features.inc';
+
+/**
+ * Implements hook_permission().
+ */
+function manatime_feature_projects_permission() {
+  return array(
+    'manage projects' => array(
+      'title' => t('Manage projects'),
+      'description' => t('Allow add, archive and edit projects.'),
+    ),
+  );
+}
