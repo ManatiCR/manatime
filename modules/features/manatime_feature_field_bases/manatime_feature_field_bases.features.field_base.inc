@@ -1,12 +1,12 @@
 <?php
 /**
- * @file
- * manatime_feature_field_bases.features.field_base.inc
- */
+* @file
+* manatime_feature_field_bases.features.field_base.inc
+*/
 
 /**
- * Implements hook_field_default_field_bases().
- */
+* Implements hook_field_default_field_bases().
+*/
 function manatime_feature_field_bases_field_default_field_bases() {
   $field_bases = array();
 
@@ -56,8 +56,8 @@ function manatime_feature_field_bases_field_default_field_bases() {
     'type' => 'list_boolean',
   );
 
-  // Exported field_base: 'field_client'.
-  $field_bases['field_client'] = array(
+  // Exported field_base: 'field_weekly_hours'.
+  $field_bases['field_weekly_hours'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
@@ -91,5 +91,24 @@ function manatime_feature_field_bases_field_default_field_bases() {
     'type' => 'entityreference',
   );
 
+  // Exported field_base: 'field_client'.
+  $field_bases['field_client'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_weekly_hours',
+    'indexes' => array(),
+    'locked' => 0,
+    'module' => 'number',
+    'settings' => array(
+      'decimal_separator' => '.',
+      'precision' => 10,
+      'scale' => 2,
+    ),
+    'translatable' => 0,
+    'type' => 'number_decimal',
+  );
+  
   return $field_bases;
 }
