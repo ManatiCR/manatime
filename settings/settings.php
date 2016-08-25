@@ -57,6 +57,7 @@ $conf['master_modules']['base'] = array(
   // Custom modules.
   'manatime_feature_clients',
   'manatime_feature_field_bases',
+  'manatime_feature_projects',
   'manatime_feature_users',
 );
 
