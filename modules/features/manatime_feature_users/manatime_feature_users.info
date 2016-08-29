@@ -11,4 +11,3 @@ features[features_api][] = api:2
 features[field_instance][] = user-user-field_weekly_hours
 features[views_view][] = collaborators_listing
 features_exclude[dependencies][ctools] = ctools
-project path = sites/all/modules/features
