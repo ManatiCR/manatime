@@ -10,19 +10,30 @@
 function manatime_install() {
   // Create a default role for site administrators,
   // with all available permissions assigned.
+  $super_admin_role = new stdClass();
   $admin_role = new stdClass();
-  $admin_role->name = 'super admin';
+  $collaborator_role = new stdClass();
+
+  $super_admin_role->name = 'super admin';
   $admin_role->name = 'administrator';
-  $admin_role->name = 'collaborator';
+  $collaborator_role->name = 'collaborator';
+
+  $super_admin_role->weight = 2;
   $admin_role->weight = 2;
+  $collaborator_role->weight = 2;
+
+  user_role_save($super_admin_role);
   user_role_save($admin_role);
-  user_role_grant_permissions($admin_role->rid, array_keys(module_invoke_all('permission')));
+  user_role_save($collaborator_role);
+
+  user_role_grant_permissions($super_admin_role->rid, array_keys(module_invoke_all('permission')));
+
   // Set this as the administrator role.
-  variable_set('user_admin_role', $admin_role->rid);
+  variable_set('user_admin_role', $super_admin_role->rid);
 
   // Assign user 1 the "administrator" role.
   db_insert('users_roles')
-    ->fields(array('uid' => 1, 'rid' => $admin_role->rid))
+    ->fields(array('uid' => 1, 'rid' => $super_admin_role->rid))
     ->execute();
 
   // Enable the admin theme.
