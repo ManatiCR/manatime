@@ -10,22 +10,21 @@
 function manatime_install() {
   // Create a default role for site administrators,
   // with all available permissions assigned.
-  $super_admin_role = new stdClass();
-  $admin_role = new stdClass();
+
   $collaborator_role = new stdClass();
-
-  $super_admin_role->name = 'super admin';
-  $admin_role->name = 'administrator';
   $collaborator_role->name = 'collaborator';
-
-  $super_admin_role->weight = 2;
-  $admin_role->weight = 2;
   $collaborator_role->weight = 2;
-
-  user_role_save($super_admin_role);
-  user_role_save($admin_role);
   user_role_save($collaborator_role);
 
+  $admin_role = new stdClass();
+  $admin_role->name = 'administrator';
+  $admin_role->weight = 3;
+  user_role_save($admin_role);
+
+  $super_admin_role = new stdClass();
+  $super_admin_role->name = 'super admin';
+  $super_admin_role->weight = 4;
+  user_role_save($super_admin_role);
   user_role_grant_permissions($super_admin_role->rid, array_keys(module_invoke_all('permission')));
 
   // Set this as the administrator role.
