@@ -1,10 +1,13 @@
 name = Manatime users feature
 core = 7.x
 package = manatime
-version = 7.x-1.0
+version = 7.x-1.1
 dependencies[] = features
 dependencies[] = manatime_feature_field_bases
 dependencies[] = number
+dependencies[] = views
+features[ctools][] = views:views_default:3.0
 features[features_api][] = api:2
 features[field_instance][] = user-user-field_weekly_hours
-project path = sites/all/modules/features
+features[views_view][] = collaborators_listing
+features_exclude[dependencies][ctools] = ctools

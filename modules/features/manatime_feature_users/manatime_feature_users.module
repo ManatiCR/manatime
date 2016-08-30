@@ -1,5 +1,7 @@
 <?php
 /**
  * @file
- * Drupal needs this blank file.
+ * Code for the Manatime users feature feature.
  */
+
+include_once 'manatime_feature_users.features.inc';
