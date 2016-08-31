@@ -29,6 +29,6 @@ features[variable][] = menu_parent_tasks
 features[variable][] = node_options_tasks
 features[variable][] = node_preview_tasks
 features[variable][] = node_submitted_tasks
+features[variable][] = page_manager_node_view_disabled
 features[views_view][] = tasks_listing
-features_exclude[dependencies][ctools] = ctools
 project path = sites/all/modules/features
