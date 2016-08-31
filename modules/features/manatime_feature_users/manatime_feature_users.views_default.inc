@@ -111,6 +111,12 @@ function manatime_feature_users_views_default_views() {
   $handler->display->display_options['filters']['status']['value'] = '0';
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
+  /* Filter criterion: User: The user ID */
+  $handler->display->display_options['filters']['uid_raw']['id'] = 'uid_raw';
+  $handler->display->display_options['filters']['uid_raw']['table'] = 'users';
+  $handler->display->display_options['filters']['uid_raw']['field'] = 'uid_raw';
+  $handler->display->display_options['filters']['uid_raw']['operator'] = '>';
+  $handler->display->display_options['filters']['uid_raw']['value']['value'] = '0';
   $handler->display->display_options['path'] = 'users/inactive';
   $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'Inactive Clients';
