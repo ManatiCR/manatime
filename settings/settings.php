@@ -109,3 +109,6 @@ $conf['cron_safe_threshold'] = 0;
 if (file_exists(DRUPAL_ROOT . '/sites/default/settings.local.php')) {
   require_once DRUPAL_ROOT . '/sites/default/settings.local.php';
 }
+
+// Manatime Theme.
+$conf['theme_default'] = 'manatime_theme';
