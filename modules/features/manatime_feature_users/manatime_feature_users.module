@@ -41,6 +41,5 @@ function manatime_feature_users_action_enable(&$entity, $context) {
  * Disable users.
  */
 function manatime_feature_users_action_disable(&$entity, $context) {
-  dpm($entity->roles[3],'entity');
   $entity->status['value'] = 0;
 }
