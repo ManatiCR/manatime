@@ -60,6 +60,7 @@ $conf['master_modules']['base'] = array(
   'manatime_feature_projects',
   'manatime_feature_tasks',
   'manatime_feature_users',
+  'manatime_theme_activator',
 );
 
 // Local environment.
@@ -108,3 +109,6 @@ $conf['cron_safe_threshold'] = 0;
 if (file_exists(DRUPAL_ROOT . '/sites/default/settings.local.php')) {
   require_once DRUPAL_ROOT . '/sites/default/settings.local.php';
 }
+
+// Manatime Theme.
+$conf['theme_default'] = 'manatime_theme';
