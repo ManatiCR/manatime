@@ -87,8 +87,8 @@ function manatime_feature_users_views_default_views() {
   $handler->display->display_options['filters']['status']['group'] = 1;
   $handler->display->display_options['filters']['status']['expose']['operator'] = FALSE;
 
-  /* Display: Active user */
-  $handler = $view->new_display('page', 'Active user', 'page');
+  /* Display: Active User */
+  $handler = $view->new_display('page', 'Active User', 'page');
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Bulk operations: User */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
@@ -129,7 +129,7 @@ function manatime_feature_users_views_default_views() {
   $handler->display->display_options['fields']['edit_node']['label'] = 'Edit user';
   $handler->display->display_options['path'] = 'users/active';
   $handler->display->display_options['menu']['type'] = 'default tab';
-  $handler->display->display_options['menu']['title'] = 'Active users';
+  $handler->display->display_options['menu']['title'] = 'Active Users';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['context'] = 0;
   $handler->display->display_options['menu']['context_only_inline'] = 0;
@@ -138,8 +138,8 @@ function manatime_feature_users_views_default_views() {
   $handler->display->display_options['tab_options']['weight'] = '0';
   $handler->display->display_options['tab_options']['name'] = 'main-menu';
 
-  /* Display: Inactive user */
-  $handler = $view->new_display('page', 'Inactive user', 'page_1');
+  /* Display: Inactive User */
+  $handler = $view->new_display('page', 'Inactive User', 'page_1');
   $handler->display->display_options['defaults']['fields'] = FALSE;
   /* Field: Bulk operations: User */
   $handler->display->display_options['fields']['views_bulk_operations']['id'] = 'views_bulk_operations';
@@ -195,7 +195,7 @@ function manatime_feature_users_views_default_views() {
   $handler->display->display_options['filters']['uid_raw']['value']['value'] = '0';
   $handler->display->display_options['path'] = 'users/inactive';
   $handler->display->display_options['menu']['type'] = 'tab';
-  $handler->display->display_options['menu']['title'] = 'Inactive Clients';
+  $handler->display->display_options['menu']['title'] = 'Inactive Users';
   $handler->display->display_options['menu']['weight'] = '0';
   $handler->display->display_options['menu']['context'] = 0;
   $handler->display->display_options['menu']['context_only_inline'] = 0;
