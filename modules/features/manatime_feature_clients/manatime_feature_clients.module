@@ -17,3 +17,41 @@ function manatime_feature_clients_permission() {
     ),
   );
 }
+
+/**
+ * Implements hook_action_info().
+ */
+function manatime_feature_clients_action_info() {
+  return array(
+    'manatime_feature_clients_action_enable' => array(
+      'type' => 'entity',
+      'label' => t('Enable clients'),
+      'behavior' => array('changes_property'),
+      'configurable' => FALSE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array('any'),
+    ),
+    'manatime_feature_clients_action_disable' => array(
+      'type' => 'entity',
+      'label' => t('Disable clients'),
+      'behavior' => array('changes_property'),
+      'configurable' => FALSE,
+      'vbo_configurable' => FALSE,
+      'triggers' => array('any'),
+    ),
+  );
+}
+
+/**
+ * Enable clients.
+ */
+function manatime_feature_clients_action_enable(&$entity, $context) {
+  $entity->field_active[LANGUAGE_NONE][0]['value'] = 1;
+}
+
+/**
+ * Disable clients.
+ */
+function manatime_feature_clients_action_disable(&$entity, $context) {
+  $entity->field_active[LANGUAGE_NONE][0]['value'] = 0;
+}
