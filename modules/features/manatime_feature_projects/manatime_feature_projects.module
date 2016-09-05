@@ -19,7 +19,7 @@ function manatime_feature_projects_permission() {
 }
 
 /**
- * Implements hook_action_info().
+ * Implements hook_action_info(). 
  */
 function manatime_feature_projects_action_info() {
   return array(
