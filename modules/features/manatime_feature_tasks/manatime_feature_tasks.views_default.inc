@@ -108,8 +108,10 @@ function manatime_feature_tasks_views_default_views() {
     'tasks' => 'tasks',
   );
 
-  /* Display: Content pane */
-  $handler = $view->new_display('panel_pane', 'Content pane', 'panel_pane_1');
+  /* Display: Tasks Listing */
+  $handler = $view->new_display('panel_pane', 'Tasks Listing', 'panel_pane_1');
+  $handler->display->display_options['pane_category']['name'] = 'Manatime';
+  $handler->display->display_options['pane_category']['weight'] = '0';
   $handler->display->display_options['argument_input'] = array(
     'nid' => array(
       'type' => 'user',
