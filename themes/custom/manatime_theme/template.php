@@ -1,5 +1,5 @@
 <?php
 /**
- *@file
+ * @file
  * Manatime theme templating functions.
  */
