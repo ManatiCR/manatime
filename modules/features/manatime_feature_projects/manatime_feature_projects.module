@@ -43,6 +43,53 @@ function manatime_feature_projects_action_info() {
 }
 
 /**
+ * Implement hook_field_widget_form_alter().
+ */
+function manatime_feature_projects_field_widget_form_alter(&$element, &$form_state, $context){
+  $query = drupal_get_query_parameters(); // query string param
+  if(!empty($query['field_project'])){
+    $element['actions']['ief_add'] = '';
+    $element['actions']['ief_add_existing'] = '';
+    if (isset($element['#field_name']) && 'field_project' == $element['#field_name']) {
+      // Do it only where no default value is set
+
+      if (!isset($element['entities'][0])) {
+        $delta = 0;
+        $project = array($query['field_project']);
+
+        foreach($form_state['inline_entity_form'] as $keyState => $formStateItem){
+          if('projects' == $formStateItem['settings']['bundles'][0]){
+            break;
+          }
+        }
+
+        $entityList = entity_load('node', $project);
+        foreach ($entityList as $key => $entity) {
+          // The whole list can be found in inline_entity_form.module, around line 350
+          $element['entities'][$delta] = array();
+          $element['entities'][$delta]['#entity'] = $entity;
+          $element['entities'][$delta]['#needs_save'] = FALSE;
+          $element['entities'][$delta]['#weight'] = 0;
+          $element['entities'][$delta]['delta'] = array(
+            '#type' => 'weight',
+            '#default_value' => $delta,
+            '#attributes' => array('class' => array(0 => ' ief-entity-delta'))
+          );
+        }
+
+        // Modifiy the invisible part
+        $form_state['inline_entity_form'][$keyState]['entities'][$delta] = array(
+          'entity' => $entity,
+          'weight' => 0,
+          'form' => NULL,
+          'needs_save' => FALSE
+        );
+      }
+    }
+  }
+}
+
+/**
  * Enable projects.
  */
 function manatime_feature_projects_action_enable(&$entity, $context) {
@@ -54,4 +101,13 @@ function manatime_feature_projects_action_enable(&$entity, $context) {
  */
 function manatime_feature_projects_action_disable(&$entity, $context) {
   $entity->field_active[LANGUAGE_NONE][0]['value'] = 0;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function manatime_feature_projects_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner === 'ctools' && $plugin_type === 'content_types') {
+    return 'plugins/content_types';
+  }
 }
