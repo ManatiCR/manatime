@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Install some functions for clients feature.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function manatime_feature_clients_install() {
+  manatime_feature_config_add_path_alias('node/add/clients', 'clients/add');
+}
