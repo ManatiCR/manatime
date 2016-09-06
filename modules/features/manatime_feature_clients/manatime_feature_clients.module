@@ -55,3 +55,15 @@ function manatime_feature_clients_action_enable(&$entity, $context) {
 function manatime_feature_clients_action_disable(&$entity, $context) {
   $entity->field_active[LANGUAGE_NONE][0]['value'] = 0;
 }
+
+/**
+ * Add path aliases.
+ */
+function clients_content_types_create_path_alias($source, $alias, $language) {
+  $path = array(
+    'source' => $source,
+    'alias' => $alias,
+    'language' => $language,
+  );
+  path_save($path);
+}
