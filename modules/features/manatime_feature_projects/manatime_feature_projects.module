@@ -50,8 +50,8 @@ function manatime_feature_projects_field_widget_form_alter(&$element, &$form_sta
   $query = drupal_get_query_parameters();
   // Query string param.
   if (!empty($query['field_project'])) {
-    $element['actions']['ief_add'] = '';
-    $element['actions']['ief_add_existing'] = '';
+    unset($element['actions']['ief_add']);
+    unset($element['actions']['ief_add_existing']);
     // Hide action buttons.
     if (isset($element['#field_name']) && 'field_project' == $element['#field_name']) {
       if (!isset($element['entities'][0])) {
@@ -63,7 +63,7 @@ function manatime_feature_projects_field_widget_form_alter(&$element, &$form_sta
           }
         }
         $entity_list = entity_load('node', $project);
-        foreach ($$entity_list as $key => $entity) {
+        foreach ($entity_list as $key => $entity) {
           $element['entities'][$delta] = array();
           $element['entities'][$delta]['#entity'] = $entity;
           $element['entities'][$delta]['#needs_save'] = FALSE;
