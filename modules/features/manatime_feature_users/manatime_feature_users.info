@@ -3,6 +3,7 @@ core = 7.x
 package = manatime
 version = 7.x-1.3
 dependencies[] = features
+dependencies[] = manatime_feature_config
 dependencies[] = manatime_feature_field_bases
 dependencies[] = number
 dependencies[] = views
