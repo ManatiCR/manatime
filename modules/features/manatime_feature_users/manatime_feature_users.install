@@ -8,5 +8,5 @@
  * Implements hook_install().
  */
 function manatime_feature_users_install() {
-  add_path_alias('admin/people/add', 'users/add', 'en');
+  add_path_alias('admin/people/create', 'users/add', 'en');
 }
