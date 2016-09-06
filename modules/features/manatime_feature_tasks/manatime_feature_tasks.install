@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Install some functions for tasks feature.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function manatime_feature_tasks_install() {
+  manatime_feature_config_add_path_alias('node/add/tasks', 'tasks/add');
+}
