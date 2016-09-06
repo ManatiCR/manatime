@@ -1,0 +1,16 @@
+<?php
+/**
+ * @file
+ * Containts some functions for the site configuration.
+ */
+
+/**
+ * Function that create the path aliases.
+ */
+function manatime_feature_config_add_path_alias($source, $alias) {
+  $path = array(
+    'source' => $source,
+    'alias' => $alias,
+  );
+  path_save($path);
+}

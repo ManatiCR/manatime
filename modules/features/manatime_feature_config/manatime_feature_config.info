@@ -1,0 +1,8 @@
+name = Manatime config feature
+core = 7.x
+package = manatime
+version = 7.x-1.0
+dependencies[] = path
+dependencies[] = pathauto
+features[features_api][] = api:2
+project path = sites/all/modules/features
