@@ -62,8 +62,8 @@ function manatime_feature_projects_field_widget_form_alter(&$element, &$form_sta
             break;
           }
         }
-        $entityList = entity_load('node', $project);
-        foreach ($entityList as $key => $entity) {
+        $entity_list = entity_load('node', $project);
+        foreach ($$entity_list as $key => $entity) {
           $element['entities'][$delta] = array();
           $element['entities'][$delta]['#entity'] = $entity;
           $element['entities'][$delta]['#needs_save'] = FALSE;
