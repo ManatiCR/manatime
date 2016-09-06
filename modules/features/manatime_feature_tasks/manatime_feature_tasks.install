@@ -8,5 +8,5 @@
  * Implements hook_install().
  */
 function manatime_feature_tasks_install() {
-  tasks_content_types_create_path_alias('node/add/projects', 'projects/add', 'en');
+  tasks_content_types_create_path_alias('node/add/tasks', 'tasks/add', 'en');
 }
