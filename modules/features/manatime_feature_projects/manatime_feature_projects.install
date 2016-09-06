@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Adding path aliases.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function manatime_feature_projects_install() {
+  add_path_alias('node/add/projects', 'projects/add', 'en');
+}
