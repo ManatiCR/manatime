@@ -8,7 +8,7 @@
 $plugin = array(
   'single' => TRUE,
   'title' => t('New task button'),
-  'content_types' => 'node_task',
+  'content_types' => 'add_task',
   'description' => t('Action to create a new task.'),
   'render callback' => 'add_task_render',
   'category' => t('Manatime'),
@@ -34,7 +34,7 @@ function add_task_render($subtype, $conf, $panel_args, $context) {
     'content' => array(
       '#markup' => l(t('Add task'), 'node/add/tasks', array(
         'query' => array(
-          'field_project' => $node->data->nid,
+          'id_project' => $node->data->nid,
         ),
       )),
     ),
