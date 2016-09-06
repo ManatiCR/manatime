@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Install some functions for projects feature.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function manatime_feature_projects_install() {
+  manatime_feature_config_add_path_alias('node/add/projects', 'projects/add');
+}
