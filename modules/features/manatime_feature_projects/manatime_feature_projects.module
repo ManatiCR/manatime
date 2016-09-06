@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Code for the Manatime projects feature feature.
@@ -43,29 +44,26 @@ function manatime_feature_projects_action_info() {
 }
 
 /**
- * Implement hook_field_widget_form_alter().
+ * Implements hook_field_widget_form_alter().
  */
-function manatime_feature_projects_field_widget_form_alter(&$element, &$form_state, $context){
-  $query = drupal_get_query_parameters(); // query string param
-  if(!empty($query['field_project'])){
+function manatime_feature_projects_field_widget_form_alter(&$element, &$form_state, $context) {
+  $query = drupal_get_query_parameters();
+  // Query string param.
+  if (!empty($query['field_project'])) {
     $element['actions']['ief_add'] = '';
     $element['actions']['ief_add_existing'] = '';
+    // Hide action buttons.
     if (isset($element['#field_name']) && 'field_project' == $element['#field_name']) {
-      // Do it only where no default value is set
-
       if (!isset($element['entities'][0])) {
         $delta = 0;
         $project = array($query['field_project']);
-
-        foreach($form_state['inline_entity_form'] as $keyState => $formStateItem){
-          if('projects' == $formStateItem['settings']['bundles'][0]){
+        foreach ($form_state['inline_entity_form'] as $key_state => $form_state_item) {
+          if ('projects' == $form_state_item['settings']['bundles'][0]) {
             break;
           }
         }
-
         $entityList = entity_load('node', $project);
         foreach ($entityList as $key => $entity) {
-          // The whole list can be found in inline_entity_form.module, around line 350
           $element['entities'][$delta] = array();
           $element['entities'][$delta]['#entity'] = $entity;
           $element['entities'][$delta]['#needs_save'] = FALSE;
@@ -73,16 +71,14 @@ function manatime_feature_projects_field_widget_form_alter(&$element, &$form_sta
           $element['entities'][$delta]['delta'] = array(
             '#type' => 'weight',
             '#default_value' => $delta,
-            '#attributes' => array('class' => array(0 => ' ief-entity-delta'))
+            '#attributes' => array('class' => array(0 => ' ief-entity-delta')),
           );
         }
-
-        // Modifiy the invisible part
-        $form_state['inline_entity_form'][$keyState]['entities'][$delta] = array(
+        $form_state['inline_entity_form'][$key_state]['entities'][$delta] = array(
           'entity' => $entity,
           'weight' => 0,
           'form' => NULL,
-          'needs_save' => FALSE
+          'needs_save' => FALSE,
         );
       }
     }
