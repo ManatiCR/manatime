@@ -7,11 +7,11 @@
  /**
   * Function to add aliases path.
   */
- function add_path_alias($source, $alias, $language) {
-   $path = array(
-     'source' => $source,
-     'alias' => $alias,
-     'language' => $language,
-   );
-   path_save($path);
- }
+function add_path_alias($source, $alias, $language) {
+  $path = array(
+    'source' => $source,
+    'alias' => $alias,
+    'language' => $language,
+  );
+  path_save($path);
+}
