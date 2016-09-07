@@ -61,6 +61,7 @@ $conf['master_modules']['base'] = array(
   'manatime_feature_projects',
   'manatime_feature_tasks',
   'manatime_feature_time_entries',
+  'manatime_feature_timesheet',
   'manatime_feature_users',
   'manatime_theme_activator',
 );
