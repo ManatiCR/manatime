@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Manatime time entries feature feature.
+ */
+
+include_once 'manatime_feature_time_entries.features.inc';
