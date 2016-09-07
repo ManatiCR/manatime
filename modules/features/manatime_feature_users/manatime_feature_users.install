@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Install some functions for users feature.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function manatime_feature_users_install() {
+  manatime_feature_config_add_path_alias('admin/people/create', 'users/add');
+}

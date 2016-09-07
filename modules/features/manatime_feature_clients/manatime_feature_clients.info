@@ -6,6 +6,7 @@ version = 7.x-1.2
 dependencies[] = ctools
 dependencies[] = features
 dependencies[] = list
+dependencies[] = manatime_feature_config
 dependencies[] = manatime_feature_field_bases
 dependencies[] = options
 dependencies[] = strongarm
