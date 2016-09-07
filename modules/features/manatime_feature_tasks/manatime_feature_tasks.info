@@ -22,7 +22,6 @@ features[field_instance][] = node-tasks-body
 features[field_instance][] = node-tasks-field_billable
 features[field_instance][] = node-tasks-field_project
 features[node][] = tasks
-features[page_manager_handlers][] = node_view__panel_context_021763f9-9425-45b7-951f-acb6b5b39ada
 features[variable][] = field_bundle_settings_node__tasks
 features[variable][] = menu_options_tasks
 features[variable][] = menu_parent_tasks
