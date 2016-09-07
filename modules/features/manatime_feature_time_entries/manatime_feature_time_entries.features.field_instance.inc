@@ -159,7 +159,11 @@ function manatime_feature_time_entries_field_default_field_instances() {
   // Exported field_instance: 'node-time_entries-field_status'.
   $field_instances['node-time_entries-field_status'] = array(
     'bundle' => 'time_entries',
-    'default_value' => NULL,
+    'default_value' => array(
+      0 => array(
+        'value' => 1,
+      ),
+    ),
     'deleted' => 0,
     'description' => '',
     'display' => array(
@@ -181,7 +185,7 @@ function manatime_feature_time_entries_field_default_field_instances() {
     'fences_wrapper' => 'div',
     'field_name' => 'field_status',
     'label' => 'Status',
-    'required' => 0,
+    'required' => 1,
     'settings' => array(
       'user_register_form' => FALSE,
     ),
