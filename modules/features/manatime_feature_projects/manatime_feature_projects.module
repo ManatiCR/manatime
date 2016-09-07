@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Code for the Manatime projects feature feature.
@@ -43,6 +44,44 @@ function manatime_feature_projects_action_info() {
 }
 
 /**
+ * Implements hook_field_widget_form_alter().
+ */
+function manatime_feature_projects_field_widget_form_alter(&$element, &$form_state, $context) {
+  $query = drupal_get_query_parameters();
+  // Query string param.
+  if (!empty($query['id_project'])) {
+    unset($element['actions']['ief_add']);
+    unset($element['actions']['ief_add_existing']);
+    if (isset($element['#field_name']) && 'field_project' == $element['#field_name']) {
+      if (!isset($element['entities'][0])) {
+        $id_project = $query['id_project'];
+        foreach ($form_state['inline_entity_form'] as $key_state => $form_state_item) {
+          if ('projects' == $form_state_item['settings']['bundles'][0]) {
+            break;
+          }
+        }
+        $project = node_load($id_project);
+        $element['entities'][0] = array();
+        $element['entities'][0]['#entity'] = $project;
+        $element['entities'][0]['#needs_save'] = FALSE;
+        $element['entities'][0]['#weight'] = 0;
+        $element['entities'][0]['delta'] = array(
+          '#type' => 'weight',
+          '#default_value' => 0,
+          '#attributes' => array('class' => array(0 => ' ief-entity-delta')),
+        );
+      }
+      $form_state['inline_entity_form'][$key_state]['entities'][0] = array(
+        'entity' => $project,
+        'weight' => 0,
+        'form' => NULL,
+        'needs_save' => FALSE,
+      );
+    }
+  }
+}
+
+/**
  * Enable projects.
  */
 function manatime_feature_projects_action_enable(&$entity, $context) {
@@ -54,4 +93,13 @@ function manatime_feature_projects_action_enable(&$entity, $context) {
  */
 function manatime_feature_projects_action_disable(&$entity, $context) {
   $entity->field_active[LANGUAGE_NONE][0]['value'] = 0;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function manatime_feature_projects_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner === 'ctools' && $plugin_type === 'content_types') {
+    return 'plugins/content_types';
+  }
 }

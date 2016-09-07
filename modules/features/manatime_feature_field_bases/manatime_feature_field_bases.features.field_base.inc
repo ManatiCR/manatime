@@ -169,6 +169,6 @@ function manatime_feature_field_bases_field_default_field_bases() {
     'translatable' => 0,
     'type' => 'entityreference',
   );
-  
+
   return $field_bases;
 }
