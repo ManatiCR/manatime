@@ -1,5 +1,0 @@
-name = Manatime Theme Activator
-description = Activate the theme manatime_theme
-core = 7.x
-package = Manatime
-version = 7.x-1.0
