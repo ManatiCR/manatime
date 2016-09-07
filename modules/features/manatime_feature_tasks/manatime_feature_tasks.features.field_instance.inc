@@ -100,62 +100,10 @@ function manatime_feature_tasks_field_default_field_instances() {
     ),
   );
 
-  // Exported field_instance: 'node-tasks-field_project'.
-  $field_instances['node-tasks-field_project'] = array(
-    'bundle' => 'tasks',
-    'deleted' => 0,
-    'description' => '',
-    'display' => array(
-      'default' => array(
-        'label' => 'above',
-        'module' => 'entityreference',
-        'settings' => array(
-          'link' => FALSE,
-        ),
-        'type' => 'entityreference_label',
-        'weight' => 1,
-      ),
-      'teaser' => array(
-        'label' => 'above',
-        'settings' => array(),
-        'type' => 'hidden',
-        'weight' => 0,
-      ),
-    ),
-    'entity_type' => 'node',
-    'fences_wrapper' => 'div',
-    'field_name' => 'field_project',
-    'label' => 'Project',
-    'required' => 1,
-    'settings' => array(
-      'user_register_form' => FALSE,
-    ),
-    'widget' => array(
-      'active' => 1,
-      'module' => 'inline_entity_form',
-      'settings' => array(
-        'fields' => array(),
-        'type_settings' => array(
-          'allow_clone' => 0,
-          'allow_existing' => 1,
-          'allow_new' => 1,
-          'delete_references' => 0,
-          'label_plural' => 'projects',
-          'label_singular' => 'project',
-          'match_operator' => 'CONTAINS',
-          'override_labels' => 1,
-        ),
-      ),
-      'type' => 'inline_entity_form',
-      'weight' => 32,
-    ),
-  );
-
   // Translatables
   // Included for use with string extractors like potx.
   t('Billable');
   t('Description');
-  t('Project');
 
   return $field_instances;
 }
