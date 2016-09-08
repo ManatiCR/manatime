@@ -90,6 +90,30 @@ function manatime_feature_site_template_default_page_manager_handlers() {
   $pane->uuid = '5b7a8c71-dd77-4bf4-9652-83055ca3aa6f';
   $display->content['new-5b7a8c71-dd77-4bf4-9652-83055ca3aa6f'] = $pane;
   $display->panels['first'][1] = 'new-5b7a8c71-dd77-4bf4-9652-83055ca3aa6f';
+  $pane = new stdClass();
+  $pane->pid = 'new-647a9e16-3d3d-4219-ac59-63463ac960c6';
+  $pane->panel = 'second';
+  $pane->type = 'page_content';
+  $pane->subtype = 'page_content';
+  $pane->shown = TRUE;
+  $pane->access = array();
+  $pane->configuration = array(
+    'context' => 'argument_page_content_1',
+    'override_title' => 0,
+    'override_title_text' => '',
+    'override_title_heading' => 'h2',
+  );
+  $pane->cache = array();
+  $pane->style = array(
+    'settings' => NULL,
+  );
+  $pane->css = array();
+  $pane->extras = array();
+  $pane->position = 0;
+  $pane->locks = array();
+  $pane->uuid = '647a9e16-3d3d-4219-ac59-63463ac960c6';
+  $display->content['new-647a9e16-3d3d-4219-ac59-63463ac960c6'] = $pane;
+  $display->panels['second'][0] = 'new-647a9e16-3d3d-4219-ac59-63463ac960c6';
   $display->hide_title = PANELS_TITLE_FIXED;
   $display->title_pane = 'new-7154f5b2-4268-410e-97f3-0598af62ac26';
   $handler->conf['display'] = $display;
