@@ -1,13 +1,14 @@
 <?php
+
 /**
  * @file
- * Manatime Theme module install and update functions.
+ * Manatime feature site template install and update functions.
  */
 
 /**
  * Implements hook_install().
  */
-function manatime_theme_activator_install() {
+function manatime_feature_site_template_install() {
   theme_enable(array('manatime_theme'));
   theme_disable(array('seven', 'bartik'));
 }

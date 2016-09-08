@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Manatime site template feature feature.
+ */
+
+include_once 'manatime_feature_site_template.features.inc';

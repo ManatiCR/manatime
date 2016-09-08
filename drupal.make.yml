@@ -61,6 +61,8 @@ projects:
     version: "1.3"
   panels:
     version: "3.7"
+  panels_everywhere:
+    version: "1.0-rc2"
   semantic_panels:
     version: "1.2"
   strongarm:
