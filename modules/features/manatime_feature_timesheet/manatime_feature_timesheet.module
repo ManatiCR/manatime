@@ -1,7 +1,46 @@
 <?php
 /**
  * @file
- * Code for the Manatime timesheet feature feature.
+ * Code for the Manatime timesheet feature.
  */
 
 include_once 'manatime_feature_timesheet.features.inc';
+
+/**
+ * Implements hook_cron().
+ */
+function manatime_feature_timesheet_cron() {
+
+  $time_execution = variable_get('manatime_feature_timesheet_execution_time', 0);
+
+  if (REQUEST_TIME >= $time_execution) {
+
+    $next_execution_time = $time_execution + 604800;
+    $begining_date = format_date(REQUEST_TIME, 'custom', 'F d, Y');
+    $end_date = format_date($next_execution_time, 'custom', 'F d, Y');
+    $begining_date_field = format_date(REQUEST_TIME, 'custom', 'Y-m-d H:i:s');
+    $end_date_field = format_date($next_execution_time, 'custom', 'Y-m-d H:i:s');
+
+    $query = db_select('users_roles', 'ur');
+    $query->join('role', 'r', 'r.rid = ur.rid AND r.name = :name', array(
+      ':name' => 'collaborator',
+    ));
+    $query->fields('ur', array('uid'));
+    $result = $query->execute()->fetchAll();
+
+    foreach ($result as $user_role) {
+      $uid = $user_role->uid;
+
+      $timesheet = new stdClass();
+      $timesheet->title = 'Timesheet from: ' . $begining_date . ' to: ' . $end_date;
+      $timesheet->type = 'timesheet';
+
+      $timesheet->field_date[LANGUAGE_NONE][0]['value'] = $begining_date_field;
+      $timesheet->field_date[LANGUAGE_NONE][0]['value2'] = $end_date_field;
+      $timesheet->field_user[LANGUAGE_NONE][0]['target_id'] = $uid;
+
+      node_save($timesheet);
+    }
+    Variable_set('manatime_feature_timesheet_execution_time', $next_execution_time);
+  }
+}
