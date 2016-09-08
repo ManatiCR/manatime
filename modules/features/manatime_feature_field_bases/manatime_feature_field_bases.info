@@ -20,5 +20,6 @@ features[field_base][] = field_status
 features[field_base][] = field_task
 features[field_base][] = field_time_entries
 features[field_base][] = field_user
+
 features[field_base][] = field_weekly_hours
 project path = sites/all/modules/features
