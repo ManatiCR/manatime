@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * manatime_feature_tasks.pages_default.inc
+ * manatime_feature_projects.pages_default.inc
  */
 
 /**
  * Implements hook_default_page_manager_handlers().
  */
-function manatime_feature_tasks_default_page_manager_handlers() {
+function manatime_feature_projects_default_page_manager_handlers() {
   $export = array();
 
   $handler = new stdClass();
@@ -177,7 +177,7 @@ function manatime_feature_tasks_default_page_manager_handlers() {
   $display->content['new-de0e0ef3-1be1-419c-9eb5-6f0285d5567d'] = $pane;
   $display->panels['middle'][3] = 'new-de0e0ef3-1be1-419c-9eb5-6f0285d5567d';
   $pane = new stdClass();
-  $pane->pid = 'new-98c132ca-b5c3-4267-8826-462b0975b03d';
+  $pane->pid = 'new-b072381d-918c-460a-b050-4d6cfd6e7d00';
   $pane->panel = 'middle';
   $pane->type = 'views_panes';
   $pane->subtype = 'tasks_listing-panel_pane_1';
@@ -196,9 +196,9 @@ function manatime_feature_tasks_default_page_manager_handlers() {
   $pane->extras = array();
   $pane->position = 4;
   $pane->locks = array();
-  $pane->uuid = '98c132ca-b5c3-4267-8826-462b0975b03d';
-  $display->content['new-98c132ca-b5c3-4267-8826-462b0975b03d'] = $pane;
-  $display->panels['middle'][4] = 'new-98c132ca-b5c3-4267-8826-462b0975b03d';
+  $pane->uuid = 'b072381d-918c-460a-b050-4d6cfd6e7d00';
+  $display->content['new-b072381d-918c-460a-b050-4d6cfd6e7d00'] = $pane;
+  $display->panels['middle'][4] = 'new-b072381d-918c-460a-b050-4d6cfd6e7d00';
   $display->hide_title = PANELS_TITLE_NONE;
   $display->title_pane = 'new-16f85efd-e42e-4411-abaf-8e36c18bd7ad';
   $handler->conf['display'] = $display;

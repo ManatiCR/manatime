@@ -51,11 +51,6 @@ function manatime_feature_tasks_views_default_views() {
       'empty_column' => 0,
     ),
   );
-  /* Relationship: Entity Reference: Referenced Entity */
-  $handler->display->display_options['relationships']['field_project_target_id']['id'] = 'field_project_target_id';
-  $handler->display->display_options['relationships']['field_project_target_id']['table'] = 'field_data_field_project';
-  $handler->display->display_options['relationships']['field_project_target_id']['field'] = 'field_project_target_id';
-  $handler->display->display_options['relationships']['field_project_target_id']['label'] = 'Project';
   /* Field: Content: Title */
   $handler->display->display_options['fields']['title']['id'] = 'title';
   $handler->display->display_options['fields']['title']['table'] = 'node';
@@ -72,11 +67,6 @@ function manatime_feature_tasks_views_default_views() {
   $handler->display->display_options['fields']['field_billable']['element_wrapper_type'] = '0';
   $handler->display->display_options['fields']['field_billable']['element_default_classes'] = FALSE;
   $handler->display->display_options['fields']['field_billable']['field_api_classes'] = TRUE;
-  /* Field: Content: Edit link */
-  $handler->display->display_options['fields']['edit_node']['id'] = 'edit_node';
-  $handler->display->display_options['fields']['edit_node']['table'] = 'views_entity_node';
-  $handler->display->display_options['fields']['edit_node']['field'] = 'edit_node';
-  $handler->display->display_options['fields']['edit_node']['label'] = 'Edit task';
   /* Sort criterion: Content: Post date */
   $handler->display->display_options['sorts']['created']['id'] = 'created';
   $handler->display->display_options['sorts']['created']['table'] = 'node';
@@ -86,7 +76,6 @@ function manatime_feature_tasks_views_default_views() {
   $handler->display->display_options['arguments']['nid']['id'] = 'nid';
   $handler->display->display_options['arguments']['nid']['table'] = 'node';
   $handler->display->display_options['arguments']['nid']['field'] = 'nid';
-  $handler->display->display_options['arguments']['nid']['relationship'] = 'field_project_target_id';
   $handler->display->display_options['arguments']['nid']['ui_name'] = 'Project NID';
   $handler->display->display_options['arguments']['nid']['default_action'] = 'not found';
   $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'fixed';
@@ -110,6 +99,24 @@ function manatime_feature_tasks_views_default_views() {
 
   /* Display: Tasks Listing */
   $handler = $view->new_display('panel_pane', 'Tasks Listing', 'panel_pane_1');
+  $handler->display->display_options['defaults']['relationships'] = FALSE;
+  /* Relationship: Entity Reference: Referencing entity */
+  $handler->display->display_options['relationships']['reverse_field_tasks_node']['id'] = 'reverse_field_tasks_node';
+  $handler->display->display_options['relationships']['reverse_field_tasks_node']['table'] = 'node';
+  $handler->display->display_options['relationships']['reverse_field_tasks_node']['field'] = 'reverse_field_tasks_node';
+  $handler->display->display_options['relationships']['reverse_field_tasks_node']['label'] = 'tasks_listing';
+  $handler->display->display_options['defaults']['arguments'] = FALSE;
+  /* Contextual filter: Project NID */
+  $handler->display->display_options['arguments']['nid']['id'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['table'] = 'node';
+  $handler->display->display_options['arguments']['nid']['field'] = 'nid';
+  $handler->display->display_options['arguments']['nid']['relationship'] = 'reverse_field_tasks_node';
+  $handler->display->display_options['arguments']['nid']['ui_name'] = 'Project NID';
+  $handler->display->display_options['arguments']['nid']['default_action'] = 'not found';
+  $handler->display->display_options['arguments']['nid']['default_argument_type'] = 'fixed';
+  $handler->display->display_options['arguments']['nid']['summary']['number_of_records'] = '0';
+  $handler->display->display_options['arguments']['nid']['summary']['format'] = 'default_summary';
+  $handler->display->display_options['arguments']['nid']['summary_options']['items_per_page'] = '25';
   $handler->display->display_options['pane_category']['name'] = 'Manatime';
   $handler->display->display_options['pane_category']['weight'] = '0';
   $handler->display->display_options['argument_input'] = array(
