@@ -8,5 +8,8 @@
  * Implement hook install.
  */
 function manatime_feature_timesheets_install() {
+  // Set the variable to the first time the function
+  // manatime_feature_timesheets_cron() will be executed,
+  // the second parameter is in timestamp format.
   variable_set('manatime_feature_timesheets_execution_time', 1473627600);
 }
