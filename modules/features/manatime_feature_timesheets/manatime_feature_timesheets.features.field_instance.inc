@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * manatime_feature_timesheet.features.field_instance.inc
+ * Manatime_feature_timesheets.features.field_instance.inc.
  */
 
 /**
  * Implements hook_field_default_field_instances().
  */
-function manatime_feature_timesheet_field_default_field_instances() {
+function manatime_feature_timesheets_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance: 'node-timesheet-field_date'.

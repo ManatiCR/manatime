@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * manatime_feature_timesheet.strongarm.inc
+ * manatime_feature_timesheets.strongarm.inc
  */
 
 /**
  * Implements hook_strongarm().
  */
-function manatime_feature_timesheet_strongarm() {
+function manatime_feature_timesheets_strongarm() {
   $export = array();
 
   $strongarm = new stdClass();

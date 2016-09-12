@@ -1,0 +1,12 @@
+<?php
+/**
+ * @file
+ * Install some functions for the timesheet feature.
+ */
+
+/**
+ * Implement hook install.
+ */
+function manatime_feature_timesheets_install() {
+  variable_set('manatime_feature_timesheets_execution_time', 1473627600);
+}

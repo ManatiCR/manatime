@@ -1,4 +1,4 @@
-name = Manatime timesheet feature
+name = Manatime timesheets feature
 core = 7.x
 package = manatime
 version = 7.x-1.0

@@ -4,14 +4,14 @@
  * Code for the Manatime timesheet feature.
  */
 
-include_once 'manatime_feature_timesheet.features.inc';
+include_once 'manatime_feature_timesheets.features.inc';
 
 /**
  * Implements hook_cron().
  */
-function manatime_feature_timesheet_cron() {
+function manatime_feature_timesheets_cron() {
 
-  $time_execution = variable_get('manatime_feature_timesheet_execution_time', 0);
+  $time_execution = variable_get('manatime_feature_timesheets_execution_time', 0);
 
   if (REQUEST_TIME >= $time_execution) {
 
@@ -41,6 +41,6 @@ function manatime_feature_timesheet_cron() {
 
       node_save($timesheet);
     }
-    Variable_set('manatime_feature_timesheet_execution_time', $next_execution_time);
+    Variable_set('manatime_feature_timesheets_execution_time', $next_execution_time);
   }
 }
