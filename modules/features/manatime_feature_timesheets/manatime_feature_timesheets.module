@@ -11,28 +11,15 @@ include_once 'manatime_feature_timesheets.features.inc';
  */
 function manatime_feature_timesheets_cron() {
   // Get the variable wich has the execution time hour.
-  $time_execution = variable_get('manatime_feature_timesheets_execution_time', 0);
-
+  $execution_time = variable_get('manatime_feature_timesheets_execution_time', 0);
   // Conditional to evaluate if it is time to execute this function, the
   // function must execute itself the sundays at 21:00:00 hours.
-  if (REQUEST_TIME >= $time_execution) {
-    // Set the next time the function is going to execute itself, the number
-    // 604800 means seven days in timestamp format.
-    $next_execution_time = $time_execution + 604800;
-
-    // Add 3 hours in timestamp format to set the variable $begining_date date
-    // and $begining_date_field to the next monday at 00:00:00 hours,
-    // 10800 are 3 hours in timestamp format.
-    $time_execution += 10800;
-
-    $begining_date = format_date($time_execution, 'custom', 'F d, Y');
-    $end_date = format_date($next_execution_time, 'custom', 'F d, Y');
-
-    // Set the variables wich will be used to set the fields date in the
-    // timesheet node, in the format the fields received.
-    $begining_date_field = format_date($time_execution, 'custom', 'Y-m-d H:i:s');
-    $end_date_field = format_date($next_execution_time, 'custom', 'Y-m-d H:i:s');
-
+  if (REQUEST_TIME >= $execution_time) {
+    // Get the beginning and end time to use in the new nodes.
+    $beginning = new DateTime('monday 00:00');
+    $end = new DateTime('next sunday 21:00');
+    // Set the next time the function will execute itself in timestamp format.
+    $next_execution_time = $beginning->getTimestamp();
     // Query to get the id of collaborators users.
     $query = db_select('users_roles', 'ur');
     $query->join('role', 'r', 'r.rid = ur.rid AND r.name = :name', array(
@@ -40,17 +27,16 @@ function manatime_feature_timesheets_cron() {
     ));
     $query->fields('ur', array('uid'));
     $result = $query->execute();
-
     // Loop to create a timesheet node for each of the collaborator users.
     while ($record = $result->fetchObject()) {
       // Get the user's id wich a timesheet node will be associated.
       $uid = $record->uid;
       // Create a node associated to the user's id.
       $timesheet = new stdClass();
-      $timesheet->title = 'Timesheet from: ' . $begining_date . ' to: ' . $end_date;
+      $timesheet->title = 'Timesheet from: ' . $beginning->format('F d, Y') . ' to: ' . $end->format('F d, Y');
       $timesheet->type = 'timesheet';
-      $timesheet->field_date[LANGUAGE_NONE][0]['value'] = $begining_date_field;
-      $timesheet->field_date[LANGUAGE_NONE][0]['value2'] = $end_date_field;
+      $timesheet->field_date[LANGUAGE_NONE][0]['value'] = $beginning->format('Y-m-d H:i:s');
+      $timesheet->field_date[LANGUAGE_NONE][0]['value2'] = $end->format('Y-m-d H:i:s');
       $timesheet->field_user[LANGUAGE_NONE][0]['target_id'] = $uid;
       node_object_prepare($timesheet);
       node_save($timesheet);
