@@ -15,11 +15,16 @@ function manatime_feature_timesheets_cron() {
   // Conditional to evaluate if it is time to execute this function, the
   // function must execute itself the sundays at 21:00:00 hours.
   if (REQUEST_TIME >= $execution_time) {
-    // Get the beginning and end time to use in the new nodes.
-    $beginning = new DateTime('monday 00:00');
-    $end = new DateTime('next sunday 21:00');
+    // Conditional to set the dates appropriately in case the function is
+    // executed manually other day but sunday.
+    $beginning = new DateTime('next monday 00:00');
+    // Set the $end date by adding it 6 days in timestamp format, stating with
+    // $beginning varible.
+    $end = $beginning->getTimestamp() + 576000;
+
     // Set the next time the function will execute itself in timestamp format.
-    $next_execution_time = $beginning->getTimestamp();
+    $next_execution_time = $end;
+
     // Query to get the id of collaborators users.
     $query = db_select('users_roles', 'ur');
     $query->join('role', 'r', 'r.rid = ur.rid AND r.name = :name', array(
@@ -33,15 +38,15 @@ function manatime_feature_timesheets_cron() {
       $uid = $record->uid;
       // Create a node associated to the user's id.
       $timesheet = new stdClass();
-      $timesheet->title = 'Timesheet from: ' . $beginning->format('F d, Y') . ' to: ' . $end->format('F d, Y');
+      $timesheet->title = 'Timesheet from: ' . $beginning->format('F d, Y') . ' to: ' . gmdate('F d, Y', $end);
       $timesheet->type = 'timesheet';
       $timesheet->field_date[LANGUAGE_NONE][0]['value'] = $beginning->format('Y-m-d H:i:s');
-      $timesheet->field_date[LANGUAGE_NONE][0]['value2'] = $end->format('Y-m-d H:i:s');
+      $timesheet->field_date[LANGUAGE_NONE][0]['value2'] = gmdate('Y-m-d H:i:s', $end);
       $timesheet->field_user[LANGUAGE_NONE][0]['target_id'] = $uid;
       node_object_prepare($timesheet);
       node_save($timesheet);
     }
     // Set the varible to the next time the function must execute itself.
-    variable_set('manatime_feature_timesheets_execution_time', $next_execution_time);
+    variable_set('manatime_feature_timesheets_execution_time', `$next_execution_time`);
   }
 }
