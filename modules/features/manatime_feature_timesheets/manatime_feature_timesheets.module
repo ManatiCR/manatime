@@ -47,6 +47,6 @@ function manatime_feature_timesheets_cron() {
       node_save($timesheet);
     }
     // Set the varible to the next time the function must execute itself.
-    variable_set('manatime_feature_timesheets_execution_time', `$next_execution_time`);
+    variable_set('manatime_feature_timesheets_execution_time', $next_execution_time);
   }
 }
