@@ -1,0 +1,16 @@
+<?php
+/**
+ * @file
+ * Install some functions for the timesheet feature.
+ */
+
+/**
+ * Implement hook install.
+ */
+function manatime_feature_timesheets_install() {
+  // Set the variable to the first time the cron action will be executed.
+  $date = new DateTime('sunday 21:00');
+  // Change the date object to timeStamp format.
+  $timestamp_date = $date->getTimestamp();
+  variable_set('manatime_feature_timesheets_execution_time', $timestamp_date);
+}
