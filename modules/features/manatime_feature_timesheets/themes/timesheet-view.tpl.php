@@ -26,8 +26,10 @@
         <!-- 7: Days of the week. -->
         <?php for ($number_day = 0; $number_day < 7; $number_day++): ?>
           <?php if (isset($record['entries'][$number_day])): ?>
-            <th title="<?php print $record['entries'][$number_day][0]['description']; ?>">
-              <?php print $record['entries'][$number_day][0]['duration']; ?>
+            <th>
+              <p title="<?php print $record['entries'][$number_day][0]['description']; ?>">
+                <?php print $record['entries'][$number_day][0]['duration']; ?>
+              </p>
             </th>
           <?php else: ?>
             <th><?php print '<a title="add time entry" href="#">add</a>'; ?></th>
