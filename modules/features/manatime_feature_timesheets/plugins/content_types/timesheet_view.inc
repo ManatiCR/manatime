@@ -88,13 +88,19 @@ function get_timesheet_records($nids_tasks, $uid) {
         foreach ($nodes as $node) {
           $date = $node->field_date[LANGUAGE_NONE][0]['value'];
           $timestamp = strtotime($date);
-          $day = date('l', $timestamp);
+          $number_day = date('w', $timestamp);
           $entry = array(
             'duration' => $node->field_duration[LANGUAGE_NONE][0]['value'],
             'description' => $node->body[LANGUAGE_NONE][0]['value'],
-            'date' => $day,
           );
-          $entries[] = $entry;
+          if (isset($entries[$number_day])) {
+            $entries[$number_day][0]['duration'] += $entry['duration'];
+            $entries[$number_day][0]['description'] = $entries[$number_day][0]['description'] . ' ' . $entry['description'];
+          }
+          else {
+            $entries[$number_day] = array();
+            array_push($entries[$number_day], $entry);
+          }
         }
       }
       // Creating new record.
