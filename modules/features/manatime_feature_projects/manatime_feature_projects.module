@@ -15,6 +15,10 @@ function manatime_feature_projects_permission() {
       'title' => t('Manage projects'),
       'description' => t('Allow add, archive and edit projects.'),
     ),
+    'manage tasks' => array(
+      'title' => t('Manage default tasks'),
+      'description' => t('Allow default tasks.'),
+    ),
   );
 }
 
@@ -43,6 +47,96 @@ function manatime_feature_projects_action_info() {
 }
 
 /**
+ * Implements hook_field_widget_form_alter().
+ */
+function manatime_feature_projects_field_widget_form_alter(&$element, &$form_state, $context) {
+  $default_tasks = variable_get('manatime_default_task', array());
+
+  if ($form_state['build_info']['form_id'] == 'projects_node_form') {
+    if ($element['#field_name'] === 'field_tasks') {
+      $delta = 0;
+
+      // @TODO: entender.
+      foreach ($form_state['inline_entity_form'] as $key_state => $form_state_item) {
+        if ('tasks' === $form_state_item['settings']['bundles'][0]) {
+          break;
+        }
+      }
+      $key_state = $element['#ief_id'];
+      foreach ($default_tasks as $task) {
+
+        $node = new stdClass();
+        $node->title = $task['task'];
+        $node->field_billable[LANGUAGE_NONE][0]['value'] = $task['billable'];
+        $node->type = "tasks";
+        $node->language = LANGUAGE_NONE;
+        $node->is_new = TRUE;
+        $node->body[LANGUAGE_NONE][0]['format'] = 'plain_text';
+        $node->body[LANGUAGE_NONE][0]['value'] = $task['description'];
+        $node->body[LANGUAGE_NONE][0]['summary'] = '';
+        $node->status = NODE_PUBLISHED;
+        $node->validated = TRUE;
+        $node->actions = array();
+        $node->actions['ief_add_save'] = 'Created task';
+        $node->actions['ief_add_cancel'] = 'Cancel';
+        node_object_prepare($node);
+
+        // node_save($node);
+        $element['entities'][$delta] = array();
+        $element['entities'][$delta]['#entity'] = $node;
+        $element['entities'][$delta]['#needs_save'] = TRUE;
+        $element['entities'][$delta]['#weight'] = $delta;
+        $element['entities'][$delta]['delta'] = array(
+          '#type' => 'weight',
+          '#default_value' => 0,
+          '#delta' => 50, // TODO CHANGE.
+          '#attributes' => array('class' => array('ief-entity-delta')),
+        );
+        $element['entities'][$delta]['actions'] = array(
+          '#type' => 'container',
+          '#attributes' => array('class' => array('ief-entity-operations')),
+          'ief_entity_edit' => array(
+            '#type' => 'submit',
+            '#value' => t('Edit'),
+            '#name' => 'ief-' . $key_state . '-entity-edit-' . $delta ,
+            '#limit_validation_errors' => array(),
+            '#ajax' => array(
+              'callback' => 'inline_entity_form_get_element',
+              'wrapper' => 'inline-entity-form-' . $key_state,
+            ),
+            '#submit' => array('inline_entity_form_open_row_form'),
+            '#ief_row_delta' => $delta,
+            '#ief_row_form' => 'edit',
+          ),
+          'ief_entity_remove' => array(
+            '#type' => 'submit',
+            '#value' => t('Remove'),
+            '#name' => 'ief-' . $key_state . '-entity-remove-' . $delta ,
+            '#limit_validation_errors' => array(),
+            '#ajax' => array(
+              'callback' => 'inline_entity_form_get_element',
+              'wrapper' => 'inline-entity-form-' . $key_state,
+            ),
+            '#submit' => array('inline_entity_form_open_row_form'),
+            '#ief_row_delta' => $delta,
+            '#ief_row_form' => 'remove',
+          ),
+        );
+        dpm($element, 'ELE');
+
+        $form_state['inline_entity_form'][$key_state]['entities'][$delta] = array(
+          'entity' => $node,
+          'weight' => 0,
+          'form' => NULL,
+          'needs_save' => TRUE,
+        );
+        $delta++;
+      }
+    }
+  }
+}
+
+/**
  * Enable projects.
  */
 function manatime_feature_projects_action_enable(&$entity, $context) {
@@ -54,4 +148,122 @@ function manatime_feature_projects_action_enable(&$entity, $context) {
  */
 function manatime_feature_projects_action_disable(&$entity, $context) {
   $entity->field_active[LANGUAGE_NONE][0]['value'] = 0;
+}
+
+/**
+ * Implements hook_form().
+ */
+function manatime_feature_projects_form($form, &$form_state) {
+
+  // We will have many fields with the same task, so we need to be able to
+  // access the form hierarchically.
+  $form['#tree'] = TRUE;
+  $default_tasks = variable_get('manatime_default_task', array());
+  $form['description'] = array(
+    '#type' => 'item',
+    '#title' => t('Form to add default tasks.'),
+  );
+
+  if (empty($form_state['num_tasks'])) {
+    $form_state['num_tasks'] = 1;
+  }
+
+  if (!empty($default_tasks)) {
+    if (empty($form_state['num_tasks']) || $form_state['num_tasks'] == 1) {
+      $form_state['num_tasks'] = count($default_tasks);
+    }
+  }
+
+  for ($delta = 1; $delta <= $form_state['num_tasks']; $delta++) {
+    $form['manatime_default_task'][$delta] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Default task #@num', array('@num' => $delta)),
+      '#collapsible' => TRUE,
+      '#collapsed' => count($default_tasks) == ($delta - 1) ? FALSE : TRUE,
+    );
+
+    $form['manatime_default_task'][$delta]['task'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Task'),
+      '#description' => t("Enter the task's name."),
+      '#size' => 20,
+      '#maxlength' => 20,
+      '#required' => TRUE,
+      '#default_value' => !empty($default_tasks[$delta]['task']) ? $default_tasks[$delta]['task'] : '',
+    );
+
+    $form['manatime_default_task'][$delta]['description'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Description'),
+      '#description' => t("Enter the task's description."),
+      '#size' => 40,
+      '#maxlength' => 40,
+      '#default_value' => !empty($default_tasks[$delta]['description']) ? $default_tasks[$delta]['description'] : '',
+    );
+
+    $form['manatime_default_task'][$delta]['billable'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Billable'),
+      '#default_value' => TRUE,
+    );
+  }
+
+  // Adds "Add another task" button.
+  $form['add_task'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add more'),
+    '#submit' => array('manatime_feature_projects_add_task'),
+  );
+
+  // If we have more than one task, this button allows removal of the
+  // last task.
+  if ($form_state['num_tasks'] > 1) {
+    $form['remove_task'] = array(
+      '#type' => 'submit',
+      '#value' => t('Remove latest task'),
+      '#submit' => array('manatime_feature_projects_remove_task'),
+      // Since we are removing a task, don't validate until later.
+      '#limit_validation_errors' => array(),
+    );
+  }
+  return system_settings_form($form);
+}
+
+/**
+ * Submit handler for "Add another task" button on
+ * Manatime_feature_projects_form().
+ */
+function manatime_feature_projects_add_task($form, &$form_state) {
+  // Everything in $form_state is persistent, so we'll just use
+  // $form_state['add_task']
+  $form_state['num_tasks']++;
+
+  // Setting $form_state['rebuild'] = TRUE causes the form to be rebuilt again.
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Submit handler for "Remove task" button on manatime_feature_projects_form().
+ */
+function manatime_feature_projects_remove_task($form, &$form_state) {
+  if ($form_state['num_tasks'] > 1) {
+    $form_state['num_tasks']--;
+  }
+  // Setting $form_state['rebuild'] = TRUE causes the form to be rebuilt again.
+  $form_state['rebuild'] = TRUE;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function manatime_feature_projects_menu() {
+  $item['admin/config/manatime/default-tasks'] = array(
+    'title' => 'Default tasks',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('manatime_feature_projects_form'),
+    'access callback' => array('manatime_feature_projects_permission'),
+    'description' => 'Add default .',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $item;
 }
