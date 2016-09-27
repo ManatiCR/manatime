@@ -52,18 +52,13 @@ function manatime_feature_projects_action_info() {
 function manatime_feature_projects_field_widget_form_alter(&$element, &$form_state, $context) {
   $default_tasks = variable_get('manatime_default_task', array());
 
-  if ($form_state['build_info']['form_id'] == 'projects_node_form') {
+  if ($form_state['build_info']['form_id'] == 'projects_node_form' && empty($element['#entity']->nid)) {
     if ($element['#field_name'] === 'field_tasks') {
-      $delta = 0;
 
-      // @TODO: entender.
-      foreach ($form_state['inline_entity_form'] as $key_state => $form_state_item) {
-        if ('tasks' === $form_state_item['settings']['bundles'][0]) {
-          break;
-        }
-      }
-      $key_state = $element['#ief_id'];
-      foreach ($default_tasks as $task) {
+      $form_id = $element['#ief_id'];
+      $form_state['field']['field_tasks'][LANGUAGE_NONE]['items_count'] = count($default_tasks);
+
+      foreach ($default_tasks as $delta => $task) {
 
         $node = new stdClass();
         $node->title = $task['task'];
@@ -77,11 +72,10 @@ function manatime_feature_projects_field_widget_form_alter(&$element, &$form_sta
         $node->status = NODE_PUBLISHED;
         $node->validated = TRUE;
         $node->actions = array();
-        $node->actions['ief_add_save'] = 'Created task';
+        $node->actions['ief_add_save'] = 'Create task';
         $node->actions['ief_add_cancel'] = 'Cancel';
         node_object_prepare($node);
 
-        // node_save($node);
         $element['entities'][$delta] = array();
         $element['entities'][$delta]['#entity'] = $node;
         $element['entities'][$delta]['#needs_save'] = TRUE;
@@ -98,11 +92,11 @@ function manatime_feature_projects_field_widget_form_alter(&$element, &$form_sta
           'ief_entity_edit' => array(
             '#type' => 'submit',
             '#value' => t('Edit'),
-            '#name' => 'ief-' . $key_state . '-entity-edit-' . $delta ,
+            '#name' => 'ief-' . $form_id . '-entity-edit-' . $delta ,
             '#limit_validation_errors' => array(),
             '#ajax' => array(
               'callback' => 'inline_entity_form_get_element',
-              'wrapper' => 'inline-entity-form-' . $key_state,
+              'wrapper' => 'inline-entity-form-' . $form_id,
             ),
             '#submit' => array('inline_entity_form_open_row_form'),
             '#ief_row_delta' => $delta,
@@ -111,22 +105,21 @@ function manatime_feature_projects_field_widget_form_alter(&$element, &$form_sta
           'ief_entity_remove' => array(
             '#type' => 'submit',
             '#value' => t('Remove'),
-            '#name' => 'ief-' . $key_state . '-entity-remove-' . $delta ,
+            '#name' => 'ief-' . $form_id . '-entity-remove-' . $delta ,
             '#limit_validation_errors' => array(),
             '#ajax' => array(
               'callback' => 'inline_entity_form_get_element',
-              'wrapper' => 'inline-entity-form-' . $key_state,
+              'wrapper' => 'inline-entity-form-' . $form_id,
             ),
             '#submit' => array('inline_entity_form_open_row_form'),
             '#ief_row_delta' => $delta,
             '#ief_row_form' => 'remove',
           ),
         );
-        dpm($element, 'ELE');
 
-        $form_state['inline_entity_form'][$key_state]['entities'][$delta] = array(
+        $form_state['inline_entity_form'][$form_id]['entities'][$delta] = array(
           'entity' => $node,
-          'weight' => 0,
+          'weight' => $delta,
           'form' => NULL,
           'needs_save' => TRUE,
         );
@@ -174,12 +167,12 @@ function manatime_feature_projects_form($form, &$form_state) {
     }
   }
 
-  for ($delta = 1; $delta <= $form_state['num_tasks']; $delta++) {
+  for ($delta = 0; $delta < $form_state['num_tasks']; $delta++) {
     $form['manatime_default_task'][$delta] = array(
       '#type' => 'fieldset',
-      '#title' => t('Default task #@num', array('@num' => $delta)),
+      '#title' => t('Default task #@num', array('@num' => $delta + 1)),
       '#collapsible' => TRUE,
-      '#collapsed' => count($default_tasks) == ($delta - 1) ? FALSE : TRUE,
+      '#collapsed' => FALSE,
     );
 
     $form['manatime_default_task'][$delta]['task'] = array(
