@@ -25,20 +25,29 @@ function timesheet_node_from_user_context($context, $conf) {
     return ctools_context_create_empty('entity:node', NULL);
   }
 
+  $beginning = new DateTime('monday 00:00');
+  $end = new DateTime('next sunday 21:00');
+
+  $beginning = new DateTime('last monday');
+  $end = $beginning->getTimestamp() + 576000;
+
   $uid = $context->data->uid;
+
   $query = new EntityFieldQuery();
   $result = $query
     ->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'timesheet')
     ->propertyCondition('status', 0)
-    ->fieldCondition('field_date', 'value', array('2016-09-12', '2016-09-20'), 'BETWEEN')
+    ->fieldCondition('field_date', 'value', array(
+      $beginning->format('Y-m-d'),
+      gmdate('Y-m-d', $end),
+    ), 'BETWEEN')
     ->fieldCondition('field_user', 'target_id', $uid, '=')
     ->execute();
 
   if (isset($result['node'])) {
     $nids = array_keys($result['node']);
-    $nid = reset($nids);
-    $node = node_load($nid);
+    $node = node_load(reset($nids));
     return ctools_context_create('entity:node', $node);
   }
   else {
