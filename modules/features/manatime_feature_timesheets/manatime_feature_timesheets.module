@@ -50,3 +50,12 @@ function manatime_feature_timesheets_cron() {
     variable_set('manatime_feature_timesheets_execution_time', $next_execution_time);
   }
 }
+
+/**
+ * Implemexsxs.
+ */
+function pa() {
+  $startdate = strtotime("monday");
+  $enddate = strtotime("+6 days", $startdate);
+  dpm(date("M D ", $startdate) . date("M D", $enddate));
+}
