@@ -1,7 +1,7 @@
 name = Manatime timesheets feature
 core = 7.x
 package = manatime
-version = 7.x-1.1
+version = 7.x-1.2
 dependencies[] = ctools
 dependencies[] = date
 dependencies[] = entityreference
@@ -25,4 +25,5 @@ features[variable][] = menu_parent_timesheet
 features[variable][] = node_options_timesheet
 features[variable][] = node_preview_timesheet
 features[variable][] = node_submitted_timesheet
+files[] = includes/timesheet.inc
 project path = sites/all/modules/features
