@@ -187,11 +187,7 @@ class Timesheet {
           $total_hours_worked += $time_entry->field_duration['und'][0]['value'];
           // Get the number day.
           $timestamp = strtotime($time_entry->field_date['und'][0]['value']);
-          $number_day = date('w', $timestamp);
-          // Change the order, monday to sunday.
-          if ($number_day == 0) {
-            $number_day = 7;
-          }
+          $number_day = date('N', $timestamp);
           if (isset($record_entries[$number_day])) {
             $record_entries[$number_day][0]['duration'] += check_plain($record_entry['duration']);
             $record_entries[$number_day][0]['description'] = check_plain($record_entries[$number_day][0]['description'] . ' ' . $record_entry['description']);
