@@ -145,7 +145,7 @@ function manatime_feature_timesheets_add_row_form($form, &$form_state) {
 function manatime_feature_timesheets_remove_row_form($form, &$form_state) {
   $form['alert'] = array(
     '#type' => 'item',
-    '#title' => t('Are you sure you want to delete records?.'),
+    '#title' => t('Are you sure to delete records?'),
   );
   $form['submit'] = array(
     '#type' => 'submit',
