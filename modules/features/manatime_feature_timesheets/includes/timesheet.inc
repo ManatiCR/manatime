@@ -179,14 +179,14 @@ class Timesheet {
         foreach ($time_entries as $time_entry) {
           $record_entry = array(
             'description' => t('@duration hrs @description', array(
-              '@duration' => $time_entry->field_duration['und'][0]['value'],
-              '@description' => $time_entry->body['und'][0]['value'],
+              '@duration' => $time_entry->field_duration[LANGUAGE_NONE][0]['value'],
+              '@description' => $time_entry->body[LANGUAGE_NONE][0]['value'],
             )),
-            'duration' => $time_entry->field_duration['und'][0]['value'],
+            'duration' => $time_entry->field_duration[LANGUAGE_NONE][0]['value'],
           );
-          $total_hours_worked += $time_entry->field_duration['und'][0]['value'];
+          $total_hours_worked += $time_entry->field_duration[LANGUAGE_NONE][0]['value'];
           // Get the number day.
-          $timestamp = strtotime($time_entry->field_date['und'][0]['value']);
+          $timestamp = strtotime($time_entry->field_date[LANGUAGE_NONE][0]['value']);
           $number_day = date('N', $timestamp);
           if (isset($record_entries[$number_day])) {
             $record_entries[$number_day][0]['duration'] += check_plain($record_entry['duration']);
