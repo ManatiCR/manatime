@@ -37,7 +37,10 @@ function manatime_feature_timesheets_menu() {
  * Implements hook_form().
  */
 function manatime_feature_timesheets_form($form, &$form_state) {
-  $actual_date = date('H:i');
+
+  $actual_date = format_date(REQUEST_TIME, $type = 'custom', $format = 'H',
+  $timezone = 'America/Chicago');
+  // $actual_date = date('H:i');
   $form['#tree'] = TRUE;
   $form['manatime_timesheet_reminder']['description'] = array(
     '#type' => 'item',
@@ -120,15 +123,15 @@ function manatime_feature_timesheets_cron() {
 
   // Get the variable wich has the time the timesheet reminder message will be sended.
   $manatime_timesheet_reminder = variable_get('manatime_timesheet_reminder', array());
-  $actual_day = new DateTime('now');
-
+  $actual_day = format_date(REQUEST_TIME, $type = 'custom', $format = 'DHi', $timezone = 'America/Chicago');
+  $current_hour = format_date(REQUEST_TIME, $type = 'custom', $format = 'H', $timezone = 'America/Chicago');
   // Joins the day, hour and minute to create a time to compare with the current time.
   $timesheet_reminder = $manatime_timesheet_reminder['day'] . $manatime_timesheet_reminder['hour'] .
   $manatime_timesheet_reminder['minute'];
 
   // Evalutes if it is time to execute the function manatime_feature_timesheets_create_timesheet_reminder.
-  if ($actual_day->format('Dhi') >= $timesheet_reminder &&
-  $actual_day->format('h') < $manatime_timesheet_reminder['hour'] + 1) {
+  if ($actual_day == $timesheet_reminder &&
+  $current_hour < $manatime_timesheet_reminder['hour'] + 1) {
     manatime_feature_timesheets_create_timesheet_reminder();
   }
 }
