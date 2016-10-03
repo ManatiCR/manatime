@@ -115,3 +115,7 @@ if (file_exists(DRUPAL_ROOT . '/sites/default/settings.local.php')) {
 
 // Manatime Theme.
 $conf['theme_default'] = 'manatime_theme';
+
+$conf['mail_system'] = array(
+  'default-system' => 'DevelMailLog',
+);
