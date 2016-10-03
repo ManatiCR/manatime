@@ -40,7 +40,9 @@
                      </p>
                    </th>
                  <?php else: ?>
-                   <th><?php print '<a title="Add time entry" href="#">add</a>'; ?></th>
+                   <th>
+                     <?php print '<a href="timesheet/add-time-entry-form/' . $id_timesheet . '/' . $record['project_id'] . '/' . $record['task_id'] . '/' . $number_day . '/nojs" class="ctools-use-modal">' . t('add') . '</a>';?>
+                   </th>
                  <?php endif; ?>
                <?php endfor; ?>
                <th>

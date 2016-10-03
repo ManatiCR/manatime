@@ -78,6 +78,28 @@ class Timesheet {
   }
 
   /**
+   * Add time_entry.
+   */
+  public function addTimeEntry($description, $duration, $id_project, $id_task, $date) {
+    global $user;
+    $entity = entity_create('node', array('type' => 'time_entries'));
+    $entity->uid = $user->uid;
+    $wrapper = entity_metadata_wrapper('node', $entity);
+    $wrapper->title = 'time_entry';
+    $wrapper->body->value = $description;
+    $wrapper->field_duration = $duration;
+    $wrapper->field_project = $id_project;
+    $wrapper->field_task = $id_task;
+    $wrapper->field_date->value = $date;
+    $wrapper->field_date->value2 = $date;
+    $wrapper->save();
+    $this->node->field_time_entries[LANGUAGE_NONE][] = array(
+      'target_id' => $wrapper->getIdentifier(),
+    );
+    node_save($this->node);
+  }
+
+  /**
    * Get time_entries.
    */
   public function getTimeEntries() {
@@ -197,13 +219,7 @@ class Timesheet {
             array_push($record_entries[$number_day], $record_entry);
           }
         }
-        $this->records[] = array(
-          'project' => check_plain($project->title),
-          'task' => check_plain($task->title),
-          'task_id' => check_plain($task->nid),
-          'time_entries' => $record_entries,
-          'total_hours_worked' => $total_hours_worked,
-        );
+        $this->addRecord($project->nid, $project->title, $task->nid, $task->title, $record_entries, $total_hours_worked);
       }
     }
   }
@@ -212,18 +228,20 @@ class Timesheet {
    * Get records.
    */
   public function getRecords() {
-    // Report fields: project, task and time entries.
     return $this->records;
   }
 
   /**
    * Add record.
    */
-  public function addRecord($project, $task) {
+  public function addRecord($id_project, $project, $id_task, $task, $time_entries, $total_hours_worked) {
     $this->records[] = array(
-      'project' => $project,
-      'task' => $task,
-      'time_entries' => array(),
+      'project_id' => check_plain($id_project),
+      'project' => check_plain($project),
+      'task_id' => check_plain($id_task),
+      'task' => check_plain($task),
+      'time_entries' => $time_entries,
+      'total_hours_worked' => check_plain($total_hours_worked),
     );
   }
 
