@@ -24,15 +24,14 @@ function timesheet_node_from_user_context($context, $conf) {
   if (empty($context->data)) {
     return ctools_context_create_empty('entity:node', NULL);
   }
-
-  $beginning = new DateTime('monday 00:00');
-  $end = new DateTime('next sunday 21:00');
-
-  $beginning = new DateTime('last monday');
+  if (date('w') == 1) {
+    $beginning = new DateTime('now');
+  }
+  else {
+    $beginning = new DateTime('last monday');
+  }
   $end = $beginning->getTimestamp() + 576000;
-
   $uid = $context->data->uid;
-
   $query = new EntityFieldQuery();
   $result = $query
     ->entityCondition('entity_type', 'node')
