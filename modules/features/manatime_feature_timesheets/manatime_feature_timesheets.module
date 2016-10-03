@@ -7,6 +7,72 @@
 include_once 'manatime_feature_timesheets.features.inc';
 
 /**
+ * Implements hook_permission().
+ */
+function manatime_feature_timesheets_permission() {
+  return array(
+    'manage timesheet reminder' => array(
+      'title' => t('Manage timesheet reminder'),
+      'description' => t('Allow set the time the reminder will be send.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function manatime_feature_timesheets_menu() {
+  $item['admin/config/manatime/timesheet-reminder'] = array(
+    'title' => 'Timesheet reminder',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('manatime_feature_timesheets_form'),
+    'access callback' => array('manatime_feature_timesheets_permission'),
+    'description' => 'Add default .',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $item;
+}
+
+/**
+ * Implements hook_form().
+ */
+function manatime_feature_timesheets_form($form, &$form_state) {
+  $actual_date = date('H:i');
+  $form['#tree'] = TRUE;
+  $form['manatime_timesheet_reminder']['description'] = array(
+    '#type' => 'item',
+    '#title' => t('Set the reminder timesheet time.'),
+  );
+
+  $form['manatime_timesheet_reminder']['day'] = array(
+    '#type' => 'select',
+    '#title' => t('Day'),
+    '#options' => array(
+      'Mon' => t('Monday'),
+      'Tue' => t('Tuesday'),
+      'Wed' => t('Wednesday'),
+      'Thu' => t('Thursday'),
+      'Fri' => t('Friday'),
+      'Sat' => t('Saturday'),
+      'Sun' => t('Sunday'),
+    ),
+  );
+
+  $form['manatime_timesheet_reminder']['hour'] = array(
+    '#type' => 'date_select',
+    '#date_format' => 'H',
+    '#default_value' => $actual_date,
+  );
+
+  $form['manatime_timesheet_reminder']['minute'] = array(
+    '#type' => 'date_select',
+    '#date_format' => 'i',
+    '#default_value' => $actual_date,
+  );
+  return system_settings_form($form);
+}
+
+/**
  * Implements hook_cron().
  */
 function manatime_feature_timesheets_cron() {
@@ -48,5 +114,52 @@ function manatime_feature_timesheets_cron() {
     }
     // Set the varible to the next time the function must execute itself.
     variable_set('manatime_feature_timesheets_execution_time', $next_execution_time);
+  }
+
+  // Set the time the timesheet reminder will be executed.
+
+  // Get the variable wich has the time the timesheet reminder message will be sended.
+  $manatime_timesheet_reminder = variable_get('manatime_timesheet_reminder', array());
+  $actual_day = new DateTime('now');
+
+  // Joins the day, hour and minute to create a time to compare with the current time.
+  $timesheet_reminder = $manatime_timesheet_reminder['day'] . $manatime_timesheet_reminder['hour'] .
+  $manatime_timesheet_reminder['minute'];
+
+  // Evalutes if it is time to execute the function manatime_feature_timesheets_create_timesheet_reminder.
+  if ($actual_day->format('Dhi') >= $timesheet_reminder &&
+  $actual_day->format('h') < $manatime_timesheet_reminder['hour'] + 1) {
+    manatime_feature_timesheets_create_timesheet_reminder();
+  }
+}
+
+/**
+ * Function to create and send an email for each of the collaborators who have not
+ * submited the timesheet.
+ */
+function manatime_feature_timesheets_create_timesheet_reminder() {
+
+  // Query to get the timesheet nodes wich has not been submited.
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'timesheet')
+    ->propertyCondition('status', 0)
+    ->execute();
+
+  if (isset($result['node'])) {
+    $nids = array_keys($result['node']);
+    $timesheets = node_load_multiple($nids);
+  }
+
+  // Create a message for each of the users wich timesheet has not been submited.
+  foreach ($timesheets as $timesheet) {
+    // Get the user's id wich a timesheet node will be associated.
+    $uid = $timesheet->field_user[LANGUAGE_NONE][0]['target_id'];
+    $message = message_create('timesheet_reminder', array('uid' => $uid));
+    $message->field_user = $timesheet->field_user;
+
+    // Function from the message_notify module, to send the message.
+    message_notify_send_message($message);
   }
 }
