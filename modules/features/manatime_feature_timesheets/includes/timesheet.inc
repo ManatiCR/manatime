@@ -97,6 +97,8 @@ class Timesheet {
       'target_id' => $wrapper->getIdentifier(),
     );
     node_save($this->node);
+    $this->fillTimeEntries();
+    $this->fillProjects();
   }
 
   /**

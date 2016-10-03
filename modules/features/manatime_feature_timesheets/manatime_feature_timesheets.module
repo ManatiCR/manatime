@@ -389,7 +389,13 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
  */
 function manatime_feature_timesheets_add_time_entry_form_submit(&$form, &$form_state) {
   $timesheet = new Timesheet($form_state['build_info']['args'][0]);
-  $monday = new DateTime('last monday 00:00');
+  $timesheet->generateRecords();
+  if (date('w') == 1) {
+    $monday = new DateTime('now');
+  }
+  else {
+    $monday = new DateTime('last monday');
+  }
   // Amount of days = (day selected - less the present day) * (day in seconds).
   $amount_of_days = ($form_state['build_info']['args'][3] - 1) * 86400;
   // Time entry data.
