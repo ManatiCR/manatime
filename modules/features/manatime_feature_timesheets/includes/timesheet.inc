@@ -20,8 +20,8 @@ class Timesheet {
   /**
    * Construct.
    */
-  public function __construct($nid) {
-    $this->node = node_load($nid);
+  public function __construct($node) {
+    $this->node = $node;
     $this->uid = $this->node->uid;
     $this->status = $this->node->status;
     $this->records = array();

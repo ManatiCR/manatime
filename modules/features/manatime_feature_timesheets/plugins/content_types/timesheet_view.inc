@@ -23,11 +23,11 @@ $plugin = array(
 function timesheet_view_render($subtype, $conf, $panel_args, $context) {
   if (isset($context[0]->data)) {
     // Get the records of this timesheet.
-    $timesheet = new Timesheet($context[0]->data->nid);
+    $node = node_load($context[0]->data->nid);
+    $timesheet = new Timesheet($node);
     $timesheet->generateRecords();
     $records = $timesheet->getRecords();
     // Build the content type block.
-    $node = node_load($context[0]->data->nid);
     $block = new stdClass();
     $block->title = '';
     $block->content = array(
