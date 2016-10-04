@@ -23,20 +23,20 @@ $plugin = array(
 function timesheet_view_render($subtype, $conf, $panel_args, $context) {
   if (isset($context[0]->data)) {
     // Get the records of this timesheet.
-    $timesheet = new Timesheet($context[0]->data->nid);
+    $node = $context[0]->data;
+    $timesheet = new Timesheet($node);
     $timesheet->generateRecords();
     $records = $timesheet->getRecords();
-    $ts = $timesheet->getNode();
     // Build the content type block.
     $block = new stdClass();
     $block->title = '';
     $block->content = array(
       'content' => array(
         '#theme' => 'timesheet-view',
-        '#id_timesheet' => $ts->nid,
-        '#timesheet_title' => $ts->title,
+        '#timesheet_id' => $node->nid,
+        '#timesheet_title' => $node->title,
         '#records' => $records,
-        '#add_row_link' => manatime_feature_timesheet_make_link_add_row($context[0]->data->nid),
+        '#add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
       ),
     );
     return $block;

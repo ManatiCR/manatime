@@ -20,8 +20,8 @@ class Timesheet {
   /**
    * Construct.
    */
-  public function __construct($nid) {
-    $this->node = node_load($nid);
+  public function __construct($node) {
+    $this->node = $node;
     $this->uid = $this->node->uid;
     $this->status = $this->node->status;
     $this->records = array();
@@ -88,14 +88,16 @@ class Timesheet {
    * Set projects.
    */
   public function fillProjects() {
-    $nids = array();
-    foreach ($this->timeEntries as $entry) {
-      $nid = $entry->field_project[LANGUAGE_NONE][0]['target_id'];
-      if (!in_array($nid, $nids)) {
-        $nids[] = $nid;
+    if (isset($this->timeEntries)) {
+      $nids = array();
+      foreach ($this->timeEntries as $record) {
+        $nids[] = $record->field_project[LANGUAGE_NONE][0]['target_id'];
       }
+      $this->projects = node_load_multiple(array_unique($nids));
     }
-    $this->projects = node_load_multiple($nids);
+    else {
+      $this->projects = array();
+    }
   }
 
   /**
@@ -197,13 +199,8 @@ class Timesheet {
             array_push($record_entries[$number_day], $record_entry);
           }
         }
-        $this->records[] = array(
-          'project' => check_plain($project->title),
-          'task' => check_plain($task->title),
-          'task_id' => check_plain($task->nid),
-          'time_entries' => $record_entries,
-          'total_hours_worked' => $total_hours_worked,
-        );
+        $remove_link_row = manatime_feature_timesheet_make_link_remove_row($this->node, $task->nid);
+        $this->addRecord($project->title, $task->title, $record_entries, $total_hours_worked, $remove_link_row);
       }
     }
   }
@@ -219,11 +216,13 @@ class Timesheet {
   /**
    * Add record.
    */
-  public function addRecord($project, $task) {
+  public function addRecord($project, $task, $time_entries, $total_hours_worked, $remove_link_row) {
     $this->records[] = array(
-      'project' => $project,
-      'task' => $task,
-      'time_entries' => array(),
+      'project' => check_plain($project),
+      'task' => check_plain($task),
+      'time_entries' => $time_entries,
+      'total_hours_worked' => check_plain($total_hours_worked),
+      'remove_link_row' => $remove_link_row,
     );
   }
 
