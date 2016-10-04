@@ -35,8 +35,8 @@ class Timesheet {
   /**
    * Get nid.
    */
-  public function getNid() {
-    return $this->node->nid;
+  public function getNode() {
+    return $this->node;
   }
 
   /**
@@ -239,6 +239,21 @@ class Timesheet {
     if (!empty($nids)) {
       node_delete_multiple($nids);
     }
+  }
+
+  /**
+   * Timesheet submit.
+   */
+  public function submit() {
+    $this->fillTimeEntries();
+    if (!empty($this->timeEntries)) {
+      foreach ($this->timeEntries as $entry) {
+        $entry->field_status[LANGUAGE_NONE][0]['value'] = 1;
+        node_save($entry);
+      }
+    }
+    $this->node->status = 1;
+    node_save($this->node);
   }
 
 }
