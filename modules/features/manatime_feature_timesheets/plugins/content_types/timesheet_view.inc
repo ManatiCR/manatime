@@ -27,14 +27,14 @@ function timesheet_view_render($subtype, $conf, $panel_args, $context) {
     $timesheet->generateRecords();
     $records = $timesheet->getRecords();
     // Build the content type block.
+    $node = node_load($context[0]->data->nid);
     $block = new stdClass();
     $block->title = '';
     $block->content = array(
       'content' => array(
         '#theme' => 'timesheet-view',
-        '#id_timesheet' => $context[0]->data->nid,
         '#records' => $records,
-        '#add_row_link' => manatime_feature_timesheet_make_link_add_row($context[0]->data->nid),
+        '#add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
       ),
     );
     return $block;
