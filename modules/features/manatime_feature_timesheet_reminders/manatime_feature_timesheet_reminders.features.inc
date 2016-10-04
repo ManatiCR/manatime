@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * manatime_feature_timesheet_reminder.features.inc
+ * manatime_feature_timesheet_reminders.features.inc
  */
 
 /**
  * Implements hook_ctools_plugin_api().
  */
-function manatime_feature_timesheet_reminder_ctools_plugin_api($module = NULL, $api = NULL) {
+function manatime_feature_timesheet_reminders_ctools_plugin_api($module = NULL, $api = NULL) {
   if ($module == "strongarm" && $api == "strongarm") {
     return array("version" => "1");
   }
@@ -16,7 +16,7 @@ function manatime_feature_timesheet_reminder_ctools_plugin_api($module = NULL, $
 /**
  * Implements hook_default_message_type().
  */
-function manatime_feature_timesheet_reminder_default_message_type() {
+function manatime_feature_timesheet_reminders_default_message_type() {
   $items = array();
   $items['timesheet_reminder'] = entity_import('message_type', '{
     "name" : "timesheet_reminder",

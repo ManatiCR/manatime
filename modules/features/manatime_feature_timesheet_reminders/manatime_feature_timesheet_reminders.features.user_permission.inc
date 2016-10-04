@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * manatime_feature_timesheet_reminder.features.user_permission.inc
+ * manatime_feature_timesheet_reminders.features.user_permission.inc
  */
 
 /**
  * Implements hook_user_default_permissions().
  */
-function manatime_feature_timesheet_reminder_user_default_permissions() {
+function manatime_feature_timesheet_reminders_user_default_permissions() {
   $permissions = array();
 
   // Exported permission: 'manage timesheet reminder'.

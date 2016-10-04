@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * manatime_feature_timesheet_reminder.features.field_instance.inc
+ * manatime_feature_timesheet_reminders.features.field_instance.inc
  */
 
 /**
  * Implements hook_field_default_field_instances().
  */
-function manatime_feature_timesheet_reminder_field_default_field_instances() {
+function manatime_feature_timesheet_reminders_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance: 'message-timesheet_reminder-field_user'.

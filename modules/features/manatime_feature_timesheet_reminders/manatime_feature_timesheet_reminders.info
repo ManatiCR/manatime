@@ -1,4 +1,4 @@
-name = Manatime timesheet reminder feature
+name = Manatime timesheet reminders feature
 core = 7.x
 package = manatime
 version = 7.x-1.0
