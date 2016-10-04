@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Manatime timesheet reminder feature feature.
+ */
+
+include_once 'manatime_feature_timesheet_reminder.features.inc';
