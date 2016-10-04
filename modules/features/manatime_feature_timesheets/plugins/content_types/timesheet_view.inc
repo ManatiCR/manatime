@@ -23,7 +23,7 @@ $plugin = array(
 function timesheet_view_render($subtype, $conf, $panel_args, $context) {
   if (isset($context[0]->data)) {
     // Get the records of this timesheet.
-    $node = node_load($context[0]->data->nid);
+    $node = $context[0]->data;
     $timesheet = new Timesheet($node);
     $timesheet->generateRecords();
     $records = $timesheet->getRecords();
