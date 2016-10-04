@@ -40,7 +40,7 @@ function manatime_feature_timesheets_form($form, &$form_state) {
 
   $actual_date = format_date(REQUEST_TIME, $type = 'custom', $format = 'H',
   $timezone = 'America/Chicago');
-  // $actual_date = date('H:i');
+
   $form['#tree'] = TRUE;
   $form['manatime_timesheet_reminder']['description'] = array(
     '#type' => 'item',
@@ -120,16 +120,17 @@ function manatime_feature_timesheets_cron() {
   }
 
   // Set the time the timesheet reminder will be executed.
-
-  // Get the variable wich has the time the timesheet reminder message will be sended.
+  // Get the variable wich has the time the reminder message will be sended.
   $manatime_timesheet_reminder = variable_get('manatime_timesheet_reminder', array());
   $actual_day = format_date(REQUEST_TIME, $type = 'custom', $format = 'DHi', $timezone = 'America/Chicago');
   $current_hour = format_date(REQUEST_TIME, $type = 'custom', $format = 'H', $timezone = 'America/Chicago');
-  // Joins the day, hour and minute to create a time to compare with the current time.
+  // Joins the day, hour and minute to create a time to compare with the current
+  // time.
   $timesheet_reminder = $manatime_timesheet_reminder['day'] . $manatime_timesheet_reminder['hour'] .
   $manatime_timesheet_reminder['minute'];
 
-  // Evalutes if it is time to execute the function manatime_feature_timesheets_create_timesheet_reminder.
+  // Evalutes if it is time to execute the function
+  // manatime_feature_timesheets_create_timesheet_reminder.
   if ($actual_day == $timesheet_reminder &&
   $current_hour < $manatime_timesheet_reminder['hour'] + 1) {
     manatime_feature_timesheets_create_timesheet_reminder();
@@ -137,8 +138,7 @@ function manatime_feature_timesheets_cron() {
 }
 
 /**
- * Function to create and send an email for each of the collaborators who have not
- * submited the timesheet.
+ * Send an email to each of the users who have not submitted the timesheet.
  */
 function manatime_feature_timesheets_create_timesheet_reminder() {
 
@@ -155,7 +155,8 @@ function manatime_feature_timesheets_create_timesheet_reminder() {
     $timesheets = node_load_multiple($nids);
   }
 
-  // Create a message for each of the users wich timesheet has not been submited.
+  // Create a message for each of the users wich timesheet has not been
+  // submited.
   foreach ($timesheets as $timesheet) {
     // Get the user's id wich a timesheet node will be associated.
     $uid = $timesheet->field_user[LANGUAGE_NONE][0]['target_id'];
