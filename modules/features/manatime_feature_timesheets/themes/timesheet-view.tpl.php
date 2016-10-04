@@ -25,7 +25,7 @@
            </tr>
          </thead>
          <tbody>
-           <?php foreach ($records as $record): ?>
+           <?php foreach ($records as $key => $record): ?>
              <tr class="record--time-entries">
                <th>
                  <p class="record--project"><?php print $record['project']?></p>
@@ -41,7 +41,7 @@
                    </th>
                  <?php else: ?>
                    <th>
-                     <?php print '<a href="timesheet/add-time-entry-form/' . $id_timesheet . '/' . $record['project_id'] . '/' . $record['task_id'] . '/' . $number_day . '/nojs" class="ctools-use-modal">' . t('add') . '</a>';?>
+                     <?php print '<a href="timesheet/add-time-entry-form/' . $timesheet_id . '/' . $record['project_id'] . '/' . $record['task_id'] . '/' . $number_day . '/nojs" class="ctools-use-modal">' . t('Add') . '</a>';?>
                    </th>
                  <?php endif; ?>
                <?php endfor; ?>

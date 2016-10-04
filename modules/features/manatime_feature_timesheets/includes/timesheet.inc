@@ -224,7 +224,7 @@ class Timesheet {
           }
         }
         $remove_link_row = manatime_feature_timesheet_make_link_remove_row($this->node, $task->nid);
-        $this->addRecord($project->title, $task->title, $record_entries, $total_hours_worked, $remove_link_row);
+        $this->addRecord($project->title, $project->nid, $task->title, $task->nid, $record_entries, $total_hours_worked, $remove_link_row);
       }
     }
   }
@@ -239,9 +239,11 @@ class Timesheet {
   /**
    * Add record.
    */
-  public function addRecord($project, $task, $time_entries, $total_hours_worked, $remove_link_row) {
+  public function addRecord($project, $project_id, $task, $task_id, $time_entries, $total_hours_worked, $remove_link_row) {
     $this->records[] = array(
+      'project_id' => check_plain($project_id),
       'project' => check_plain($project),
+      'task_id' => check_plain($task_id),
       'task' => check_plain($task),
       'time_entries' => $time_entries,
       'total_hours_worked' => check_plain($total_hours_worked),

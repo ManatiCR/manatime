@@ -21,10 +21,11 @@ function manatime_feature_timesheets_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['timesheet/add-time-entry-form/%/%/%/%/%ctools_js'] = array(
+  $items['timesheet/add-time-entry-form/%node/%/%/%/%ctools_js'] = array(
     'page callback' => 'manatime_feature_timesheets_add_time_entry_callback',
     'page arguments' => array(2, 3, 4, 5, 6),
-    'access callback' => 'user_is_logged_in',
+    'access callback' => 'manatime_feature_timesheet_validate_user',
+    'access arguments' => array(2),
     'type' => MENU_CALLBACK,
   );
 
@@ -111,15 +112,7 @@ function manatime_feature_timesheets_theme() {
   return array(
     'timesheet-view' => array(
       'variables' => array(
-        'records' => array(),
-        'add_row_link' => '',
-      ),
-      'template' => 'timesheet-view',
-      'path' => drupal_get_path('module', 'manatime_feature_timesheets') . '/themes',
-    ),
-    'timesheet-view' => array(
-      'variables' => array(
-        'id_timesheet' => '',
+        'timesheet_id' => '',
         'records' => array(),
         'add_row_link' => '',
       ),
@@ -304,7 +297,7 @@ function manatime_feature_timesheets_add_row_callback($node, $ajax) {
 /**
  * Ajax menu callback - Add row.
  */
-function manatime_feature_timesheets_add_time_entry_callback($timesheet_id, $project_id, $task_id, $number_day, $ajax) {
+function manatime_feature_timesheets_add_time_entry_callback($node, $project_id, $task_id, $number_day, $ajax) {
   if ($ajax) {
     ctools_include('ajax');
     ctools_include('modal');
@@ -315,7 +308,7 @@ function manatime_feature_timesheets_add_time_entry_callback($timesheet_id, $pro
     );
 
     $form_state['build_info']['args'] = array(
-      $timesheet_id,
+      $node,
       $project_id,
       $task_id,
       $number_day,
@@ -393,9 +386,10 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
   $task = entity_metadata_wrapper('node', $form_state['complete form']['task']['#value']);
   $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->nid);
   // Add new row.
-  $timesheet->addRecord($project->label(), $task->label(), array(), 0, $remove_link_row);
+  $timesheet->addRecord($project->label(), $project->getIdentifier(), $task->label(), $task->getIdentifier(), array(), 0, $remove_link_row);
   $records = $timesheet->getRecords();
   $variables = array(
+    'timesheet_id' => $node->nid,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($timesheet->getNid()),
   );
@@ -410,7 +404,8 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
  * Drupal form submit handler - Add time entry.
  */
 function manatime_feature_timesheets_add_time_entry_form_submit(&$form, &$form_state) {
-  $timesheet = new Timesheet($form_state['build_info']['args'][0]);
+  $node = $form_state['build_info']['args'][0];
+  $timesheet = new Timesheet($node);
   $timesheet->generateRecords();
   if (date('w') == 1) {
     $monday = new DateTime('now');
@@ -431,7 +426,7 @@ function manatime_feature_timesheets_add_time_entry_form_submit(&$form, &$form_s
   $timesheet->generateRecords();
   $records = $timesheet->getRecords();
   $variables = array(
-    'id_timesheet' => $timesheet->getNid(),
+    'timesheet_id' => $node->nid,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
   );
@@ -453,7 +448,7 @@ function manatime_feature_timesheets_remove_row_form_submit(&$form, &$form_state
   $timesheet->generateRecords();
   $records = $timesheet->getRecords();
   $variables = array(
-    'id_timesheet' => $node->nid,
+    'timesheet_id' => $node->nid,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
   );
