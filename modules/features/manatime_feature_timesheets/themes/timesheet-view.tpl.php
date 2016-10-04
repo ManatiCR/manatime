@@ -49,7 +49,7 @@
                  <?php print $record['total_hours_worked']; ?>
                </th>
                <th>
-                 <?php print '<a href="timesheet/remove-row-form/' . $id_timesheet . '/' . $record['task_id'] . '/nojs" class="ctools-use-modal">' . t('Remove row') . '</a>';?>
+                 <?php print $record['remove_link_row'];?>
                </th>
              </tr>
            <?php endforeach; ?>
