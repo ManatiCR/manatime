@@ -147,8 +147,9 @@ function manatime_feature_timesheets_create_timesheet_reminder() {
     ->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'timesheet')
     ->fieldCondition('field_date', 'value', array(
-       $beginning_date->format('Y-m-d'),
-       gmdate('Y-m-d', $end_date)), 'BETWEEN')
+      $beginning_date->format('Y-m-d'),
+      gmdate('Y-m-d', $end_date),
+    ), 'BETWEEN')
     ->propertyCondition('status', 0)
     ->execute();
 
