@@ -13,7 +13,10 @@ function manatime_feature_timesheet_reminders_user_default_permissions() {
   // Exported permission: 'manage timesheet reminder'.
   $permissions['manage timesheet reminder'] = array(
     'name' => 'manage timesheet reminder',
-    'roles' => array(),
+    'roles' => array(
+      'administrator' => 'administrator',
+      'super admin' => 'super admin',
+    ),
     'module' => 'manatime_feature_timesheets',
   );
 
