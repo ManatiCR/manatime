@@ -26,7 +26,7 @@ class Timesheet {
     $this->status = $this->node->status;
     $this->records = array();
     $this->timeEntries = array();
-    $this->proje functional reviewcts = array();
+    $this->projects = array();
 
     $this->fillTimeEntries();
     $this->fillProjects();
