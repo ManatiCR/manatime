@@ -27,7 +27,7 @@ function manatime_feature_timesheets_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('manatime_feature_timesheets_form'),
     'access callback' => array('manatime_feature_timesheets_permission'),
-    'description' => 'Set the time the timesheet reminder will be sended.',
+    'description' => 'Set the time the timesheet reminder will be sent.',
     'type' => MENU_LOCAL_TASK,
   );
   return $item;
