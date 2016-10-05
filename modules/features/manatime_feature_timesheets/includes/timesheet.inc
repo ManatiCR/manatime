@@ -214,7 +214,7 @@ class Timesheet {
     return $entries;
   }
 
-  /** functional review
+  /**
    * Get time_entries per project.
    *
    * @param int $id_project
