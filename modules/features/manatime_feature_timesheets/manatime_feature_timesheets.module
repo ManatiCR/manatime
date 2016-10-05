@@ -129,7 +129,7 @@ function manatime_feature_timesheets_add_row_form($form, &$form_state) {
   $node = $form_state['build_info']['args'][0];
   $timesheet = new Timesheet($node);
   // Get the list of options to the dropdown project.
-  $options_project = timesheet_get_projects_options();
+  $options_project = timesheet_get_projects_options($timesheet);
   // Selected default option to the dropdown project.
   $selected = isset($form_state['values']['project']) ? $form_state['values']['project'] : key($options_project);
   $form['project'] = array(
@@ -218,18 +218,22 @@ function manatime_feature_timesheet_make_link_remove_row($node, $id_task) {
 /**
  * Helper function to populate the project dropdown.
  */
-function timesheet_get_projects_options() {
+function timesheet_get_projects_options($timesheet) {
   $list = array();
   $query = new EntityFieldQuery();
-  // Get only active projects.
+  // Get only active projects with tasks.
   $result = $query
     ->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'projects')
     ->fieldCondition('field_active', 'value', 1, '=')
+    ->fieldCondition('field_tasks', 'target_id', 'NULL', '!=')
     ->execute();
   if (isset($result['node'])) {
     $nids = array_keys($result['node']);
-    $projects = node_load_multiple($nids);
+    // Load only the projects with available tasks, if all the project's tasks
+    // has been reported, the project will be blocked.
+    $blocked_nids = $timesheet->getBlockedProjects();
+    $projects = node_load_multiple(array_diff($nids, $blocked_nids));
   }
   foreach ($projects as $project) {
     // Get only projects with tasks.
@@ -384,9 +388,9 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
   $timesheet->generateRecords();
   $project = entity_metadata_wrapper('node', $form_state['complete form']['project']['#value']);
   $task = entity_metadata_wrapper('node', $form_state['complete form']['task']['#value']);
-  $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->nid);
   // Add new row.
-  $timesheet->addRecord($project->label(), $project->getIdentifier(), $task->label(), $task->getIdentifier(), array(), 0, $remove_link_row);
+  $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->getIdentifier());
+  $timesheet->addRecord($project->label(), $task->label(), array(), 0, $remove_link_row);
   $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
