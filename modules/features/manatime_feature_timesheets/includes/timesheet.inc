@@ -236,9 +236,9 @@ class Timesheet {
   }
 
   /**
-   * Returns the reports in an array.
+   * Returns the records in an array.
    *
-   * A report is an array wich contain the row's values: project name, task
+   * A record is an array wich contain the row's values: project name, task
    * name, time entries, total hours worked and a link to remove it.
    */
   public function generateRecords() {
