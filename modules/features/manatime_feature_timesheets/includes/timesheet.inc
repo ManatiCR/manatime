@@ -34,6 +34,9 @@ class Timesheet {
 
   /**
    * Get nid.
+   *
+   * @return object
+   *   The node timesheet.
    */
   public function getNode() {
     return $this->node;
@@ -41,6 +44,9 @@ class Timesheet {
 
   /**
    * Set status.
+   *
+   * @param int $status
+   *   The timesheet status, published or not published.
    */
   public function setStatus($status) {
     $this->status = $status;
@@ -48,6 +54,9 @@ class Timesheet {
 
   /**
    * Get status.
+   *
+   * @return int
+   *   The timesheet status, published or not published.
    */
   public function getStatus() {
     return $this->status;
@@ -55,6 +64,9 @@ class Timesheet {
 
   /**
    * Get uid.
+   *
+   * @return int
+   *   The timesheet user's id owner.
    */
   public function getUid() {
     return $this->uid;
@@ -79,6 +91,9 @@ class Timesheet {
 
   /**
    * Get time_entries.
+   *
+   * @return object
+   *   The timesheet's time entries.
    */
   public function getTimeEntries() {
     return $this->timeEntries;
@@ -101,7 +116,13 @@ class Timesheet {
   }
 
   /**
-   * Get projects blocked, without available tasks.
+   * Get blocked projects.
+   *
+   * When all the project's tasks has been reported, the
+   * project will be blocked.
+   *
+   * @return object
+   *   Only the blocked projects.
    */
   public function getBlockedProjects() {
     $list = array();
@@ -124,6 +145,9 @@ class Timesheet {
 
   /**
    * Get projects.
+   *
+   * @return object
+   *   All timesheet's projects.
    */
   public function getProjects() {
     return $this->projects;
@@ -131,6 +155,12 @@ class Timesheet {
 
   /**
    * Get time_entries per day.
+   *
+   * @param string $day
+   *   The timesheet status, published or not published.
+   *
+   * @return object
+   *   Only entries with a date equal to $day value.
    */
   public function getTimeEntriesPerDay($day) {
     $entries = array();
@@ -144,6 +174,12 @@ class Timesheet {
 
   /**
    * Get time_entries per task.
+   *
+   * @param int $id_task
+   *   A node task's id.
+   *
+   * @return object
+   *   Only entries with a task's id equal to $id_task value.
    */
   public function getTimeEntriesPerTask($id_task) {
     $entries = array();
@@ -157,6 +193,12 @@ class Timesheet {
 
   /**
    * Get time_entries per project.
+   *
+   * @param int $id_project
+   *   A node project's id.
+   *
+   * @return object
+   *   Only entries with a project's id equal to $id_project value.
    */
   public function getTimeEntriesPerProject($id_project) {
     $node = node_load($id_project);
@@ -173,6 +215,12 @@ class Timesheet {
 
   /**
    * Get time_entries per project.
+   *
+   * @param int $id_project
+   *   A node project's id.
+   *
+   * @return object
+   *   Only tasks with a project's id equal to $id_project value.
    */
   public function getTasksPerProject($id_project) {
     $node = node_load($id_project);
@@ -188,6 +236,9 @@ class Timesheet {
 
   /**
    * Returns the reports in an array.
+   *
+   * A report is a row in the timesheet weekly view and it has: project, task,
+   * time entries, total hours worked and a link to remove it.
    */
   public function generateRecords() {
     $this->records = array();
@@ -229,14 +280,27 @@ class Timesheet {
 
   /**
    * Get records.
+   *
+   * @return array
+   *   The records to create the rows in the timesheet weekly view.
    */
   public function getRecords() {
-    // Report fields: project, task and time entries.
     return $this->records;
   }
 
   /**
    * Add record.
+   *
+   * @param string $project
+   *   A project name.
+   * @param string $task
+   *   A task name.
+   * @param array $time_entries
+   *   All task's time entries.
+   * @param int $total_hours_worked
+   *   Total hours'worked in a task.
+   * @param string $remove_link_row
+   *   A link to remove the record.
    */
   public function addRecord($project, $task, $time_entries, $total_hours_worked, $remove_link_row) {
     $this->records[] = array(
@@ -250,6 +314,9 @@ class Timesheet {
 
   /**
    * Remove record.
+   *
+   * @param int $task_id
+   *   The task's id to delete.
    */
   public function removeRecord($task_id) {
     $task_entries = $this->getTimeEntriesPerTask($task_id);
