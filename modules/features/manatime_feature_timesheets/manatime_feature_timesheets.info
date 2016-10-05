@@ -8,6 +8,7 @@ dependencies[] = entityreference
 dependencies[] = features
 dependencies[] = inline_entity_form
 dependencies[] = manatime_feature_field_bases
+dependencies[] = message_notify
 dependencies[] = options
 dependencies[] = strongarm
 features[ctools][] = strongarm:strongarm:1

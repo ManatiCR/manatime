@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Manatime_feature_timesheets.features.inc.
+ * manatime_feature_timesheets.features.inc
  */
 
 /**
