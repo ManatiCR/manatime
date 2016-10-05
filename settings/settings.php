@@ -38,6 +38,7 @@ $conf['master_modules']['base'] = array(
   'ctools',
   'date_api',
   'entity',
+  'entity_token',
   'features',
   'fences',
   'link',
