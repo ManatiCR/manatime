@@ -188,11 +188,12 @@ function manatime_feature_timesheet_make_link_remove_row($node, $id_task) {
 function timesheet_get_projects_options($timesheet) {
   $list = array();
   $query = new EntityFieldQuery();
-  // Get only active projects.
+  // Get only active projects with tasks.
   $result = $query
     ->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'projects')
     ->fieldCondition('field_active', 'value', 1, '=')
+    ->fieldCondition('field_tasks', 'target_id', 'NULL', '!=')
     ->execute();
   if (isset($result['node'])) {
     $nids = array_keys($result['node']);
