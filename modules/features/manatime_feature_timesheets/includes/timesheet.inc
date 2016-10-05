@@ -26,7 +26,7 @@ class Timesheet {
     $this->status = $this->node->status;
     $this->records = array();
     $this->timeEntries = array();
-    $this->projects = array();
+    $this->proje functional reviewcts = array();
 
     $this->fillTimeEntries();
     $this->fillProjects();
@@ -46,7 +46,7 @@ class Timesheet {
    * Set status.
    *
    * @param int $status
-   *   The timesheet status, published or not published.
+   *   The timesheet status, published or not published, possible values 1 or 0.
    */
   public function setStatus($status) {
     $this->status = $status;
@@ -92,7 +92,7 @@ class Timesheet {
   /**
    * Get time_entries.
    *
-   * @return object
+   * @return array
    *   The timesheet's time entries.
    */
   public function getTimeEntries() {
@@ -121,7 +121,7 @@ class Timesheet {
    * When all the project's tasks has been reported, the
    * project will be blocked.
    *
-   * @return object
+   * @return array
    *   Only the blocked projects.
    */
   public function getBlockedProjects() {
@@ -146,7 +146,7 @@ class Timesheet {
   /**
    * Get projects.
    *
-   * @return object
+   * @return array
    *   All timesheet's projects.
    */
   public function getProjects() {
@@ -156,16 +156,17 @@ class Timesheet {
   /**
    * Get time_entries per day.
    *
-   * @param string $day
-   *   The timesheet status, published or not published.
+   * @param string $date
+   *   A date to filter the time entries per date, possible value: a date with
+   *   format 'Y-m-d'.
    *
-   * @return object
-   *   Only entries with a date equal to $day value.
+   * @return array
+   *   Only entries with a date equal to $date value.
    */
-  public function getTimeEntriesPerDay($day) {
+  public function getTimeEntriesPerDay($date) {
     $entries = array();
     foreach ($this->timeEntries as $entry) {
-      if ($entry->field_date[LANGUAGE_NONE][0]['value'] === $day) {
+      if ($entry->field_date[LANGUAGE_NONE][0]['value'] === $date) {
         $entries[] = $entry;
       }
     }
@@ -178,7 +179,7 @@ class Timesheet {
    * @param int $id_task
    *   A node task's id.
    *
-   * @return object
+   * @return array
    *   Only entries with a task's id equal to $id_task value.
    */
   public function getTimeEntriesPerTask($id_task) {
@@ -197,7 +198,7 @@ class Timesheet {
    * @param int $id_project
    *   A node project's id.
    *
-   * @return object
+   * @return array
    *   Only entries with a project's id equal to $id_project value.
    */
   public function getTimeEntriesPerProject($id_project) {
@@ -213,13 +214,13 @@ class Timesheet {
     return $entries;
   }
 
-  /**
+  /** functional review
    * Get time_entries per project.
    *
    * @param int $id_project
    *   A node project's id.
    *
-   * @return object
+   * @return array
    *   Only tasks with a project's id equal to $id_project value.
    */
   public function getTasksPerProject($id_project) {
@@ -237,8 +238,8 @@ class Timesheet {
   /**
    * Returns the reports in an array.
    *
-   * A report is a row in the timesheet weekly view and it has: project, task,
-   * time entries, total hours worked and a link to remove it.
+   * A report is an array wich contain the row's values: project name, task
+   * name, time entries, total hours worked and a link to remove it.
    */
   public function generateRecords() {
     $this->records = array();
