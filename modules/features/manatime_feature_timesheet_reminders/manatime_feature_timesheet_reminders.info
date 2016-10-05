@@ -13,7 +13,6 @@ dependencies[] = options
 dependencies[] = strongarm
 features[ctools][] = strongarm:strongarm:1
 features[features_api][] = api:2
-features[field_instance][] = message-timesheet_reminder-field_user
 features[message_type][] = timesheet_reminder
 features[user_permission][] = manage timesheet reminder
 features[variable][] = field_bundle_settings_message__timesheet_reminder
