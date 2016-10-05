@@ -35,8 +35,8 @@ class Timesheet {
   /**
    * Get nid.
    */
-  public function getNid() {
-    return $this->node->nid;
+  public function getNode() {
+    return $this->node;
   }
 
   /**
@@ -98,6 +98,28 @@ class Timesheet {
     else {
       $this->projects = array();
     }
+  }
+
+  /**
+   * Get projects blocked, without available tasks.
+   */
+  public function getBlockedProjects() {
+    $list = array();
+    if (isset($this->projects)) {
+      foreach ($this->projects as $project) {
+        $blocked = TRUE;
+        $nids = $project->field_tasks[LANGUAGE_NONE];
+        foreach ($nids as $nid) {
+          if (empty($this->getTimeEntriesPerTask($nid['target_id']))) {
+            $blocked = FALSE;
+          }
+        }
+        if ($blocked) {
+          $list[] = $project->nid;
+        }
+      }
+    }
+    return $list;
   }
 
   /**
@@ -238,6 +260,21 @@ class Timesheet {
     if (!empty($nids)) {
       node_delete_multiple($nids);
     }
+  }
+
+  /**
+   * Timesheet submit.
+   */
+  public function submit() {
+    $this->fillTimeEntries();
+    if (!empty($this->timeEntries)) {
+      foreach ($this->timeEntries as $entry) {
+        $entry->field_status[LANGUAGE_NONE][0]['value'] = 1;
+        node_save($entry);
+      }
+    }
+    $this->node->status = 1;
+    node_save($this->node);
   }
 
 }
