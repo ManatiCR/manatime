@@ -35,6 +35,7 @@ function manatime_feature_timesheets_menu() {
     'access callback' => 'manatime_feature_timesheet_validate_user',
     'access arguments' => array(2),
     'type' => MENU_CALLBACK,
+  );
 
   $item['admin/config/manatime/timesheet-reminder'] = array(
     'title' => 'Timesheet reminder',
