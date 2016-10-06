@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Manatime_feature_timesheets.features.field_instance.inc.
+ * manatime_feature_timesheets.features.field_instance.inc
  */
 
 /**

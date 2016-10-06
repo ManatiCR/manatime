@@ -29,6 +29,15 @@ function manatime_feature_timesheets_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $item['admin/config/manatime/timesheet-reminder'] = array(
+    'title' => 'Timesheet reminder',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('manatime_feature_timesheets_form'),
+    'access callback' => array('manatime_feature_timesheets_permission'),
+    'description' => 'Set the time the timesheet reminder will be sent.',
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 
@@ -38,6 +47,52 @@ function manatime_feature_timesheets_menu() {
 function manatime_feature_timesheet_validate_user($node) {
   global $user;
   return $node->uid === $user->uid;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function manatime_feature_timesheets_permission() {
+  return array(
+    'manage timesheet reminder' => array(
+      'title' => t('Manage timesheet reminder'),
+      'description' => t('Allow set the time the reminder will be send.'),
+    ),
+  );
+}
+
+/**
+ * Form callback to set the time the the timesheet reminder will be sended.
+ */
+function manatime_feature_timesheets_form($form, &$form_state) {
+
+  $actual_date = format_date(REQUEST_TIME, 'custom', $format = 'g');
+  $form['#tree'] = TRUE;
+  $form['manatime_timesheet_reminder']['description'] = array(
+    '#type' => 'item',
+    '#title' => t('Set the reminder timesheet time.'),
+  );
+
+  $form['manatime_timesheet_reminder']['day'] = array(
+    '#type' => 'select',
+    '#title' => t('Day'),
+    '#options' => array(
+      'Mon' => t('Monday'),
+      'Tue' => t('Tuesday'),
+      'Wed' => t('Wednesday'),
+      'Thu' => t('Thursday'),
+      'Fri' => t('Friday'),
+      'Sat' => t('Saturday'),
+      'Sun' => t('Sunday'),
+    ),
+  );
+
+  $form['manatime_timesheet_reminder']['hour'] = array(
+    '#type' => 'date_select',
+    '#date_format' => 'ga',
+    '#default_value' => $actual_date,
+  );
+  return system_settings_form($form);
 }
 
 /**
@@ -77,11 +132,70 @@ function manatime_feature_timesheets_cron() {
       $timesheet->field_date[LANGUAGE_NONE][0]['value'] = $beginning->format('Y-m-d H:i:s');
       $timesheet->field_date[LANGUAGE_NONE][0]['value2'] = gmdate('Y-m-d H:i:s', $end);
       $timesheet->field_user[LANGUAGE_NONE][0]['target_id'] = $uid;
+      $timesheet->status = 0;
       node_object_prepare($timesheet);
       node_save($timesheet);
     }
     // Set the varible to the next time the function must execute itself.
     variable_set('manatime_feature_timesheets_execution_time', $next_execution_time);
+  }
+
+  // Set the time the timesheet reminder will be executed.
+  // Get the variable wich has the time the reminder message will be sended.
+  $manatime_timesheet_reminder = variable_get('manatime_timesheet_reminder', array());
+  $current_day = format_date(REQUEST_TIME, 'custom', $format = 'D');
+  $current_hour = format_date(REQUEST_TIME, 'custom', $format = 'H');
+
+  // Evaluates if it is time to execute the function
+  // manatime_feature_timesheets_create_timesheet_reminder.
+  if ($current_day == $manatime_timesheet_reminder['day'] &&
+  $current_hour <= $manatime_timesheet_reminder['hour'] + 1) {
+    manatime_feature_timesheets_create_timesheet_reminder();
+  }
+}
+
+/**
+ * Send an email to each of the users who have not submitted the timesheet.
+ */
+function manatime_feature_timesheets_create_timesheet_reminder() {
+
+  // Conditional to get only the timesheets of the current week.
+  if (date('w') == 1) {
+    $beginning_date = new DateTime('now');
+  }
+  else {
+    $beginning_date = new DateTime('last monday');
+  }
+  // Set the end date of the current week by adding it 6 days in timestamp
+  // format to the beginning date.
+  $end_date = $beginning_date->getTimestamp() + 576000;
+  // Query to get the timesheet nodes wich has not been submited.
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'timesheet')
+    ->fieldCondition('field_date', 'value', array(
+      $beginning_date->format('Y-m-d'),
+      gmdate('Y-m-d', $end_date),
+    ), 'BETWEEN')
+    ->propertyCondition('status', 0)
+    ->execute();
+
+  $timesheets = array();
+  if (isset($result['node'])) {
+    $nids = array_keys($result['node']);
+    $timesheets = node_load_multiple($nids);
+  }
+
+  // Create a message for each of the users wich timesheet has not been
+  // submited.
+  foreach ($timesheets as $timesheet) {
+    // Get the user's id wich a timesheet node will be associated.
+    $uid = $timesheet->field_user[LANGUAGE_NONE][0]['target_id'];
+    $message = message_create('timesheet_reminder', array('uid' => $uid));
+
+    // Function from the message_notify module, to send the message.
+    message_notify_send_message($message);
   }
 }
 
