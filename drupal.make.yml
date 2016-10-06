@@ -55,6 +55,10 @@ projects:
     version: "1.4"
   master:
     version: "2.0-beta4"
+  message:
+    version: "1.12"
+  message_notify:
+    version: "2.5"
   module_filter:
     version: "2.0"
   pathauto:
