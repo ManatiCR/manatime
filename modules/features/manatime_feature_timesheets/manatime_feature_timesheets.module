@@ -1,10 +1,53 @@
 <?php
+
 /**
  * @file
  * Code for the Manatime timesheet feature.
  */
 
 include_once 'manatime_feature_timesheets.features.inc';
+
+/**
+ * Implements hook_menu().
+ */
+function manatime_feature_timesheets_menu() {
+  $items = array();
+
+  $items['timesheet/add-new-form/%node/%ctools_js'] = array(
+    'page callback' => 'manatime_feature_timesheets_add_row_callback',
+    'page arguments' => array(2, 3),
+    'access callback' => 'manatime_feature_timesheet_validate_user',
+    'access arguments' => array(2),
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['timesheet/remove-row-form/%node/%/%ctools_js'] = array(
+    'page callback' => 'manatime_feature_timesheets_remove_row_callback',
+    'page arguments' => array(2, 3, 4),
+    'access callback' => 'manatime_feature_timesheet_validate_user',
+    'access arguments' => array(2),
+    'type' => MENU_CALLBACK,
+  );
+
+  $item['admin/config/manatime/timesheet-reminder'] = array(
+    'title' => 'Timesheet reminder',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('manatime_feature_timesheets_form'),
+    'access callback' => array('manatime_feature_timesheets_permission'),
+    'description' => 'Set the time the timesheet reminder will be sent.',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  return $items;
+}
+
+/**
+ * Validate the user.
+ */
+function manatime_feature_timesheet_validate_user($node) {
+  global $user;
+  return $node->uid === $user->uid;
+}
 
 /**
  * Implements hook_permission().
@@ -16,21 +59,6 @@ function manatime_feature_timesheets_permission() {
       'description' => t('Allow set the time the reminder will be send.'),
     ),
   );
-}
-
-/**
- * Implements hook_menu().
- */
-function manatime_feature_timesheets_menu() {
-  $item['admin/config/manatime/timesheet-reminder'] = array(
-    'title' => 'Timesheet reminder',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('manatime_feature_timesheets_form'),
-    'access callback' => array('manatime_feature_timesheets_permission'),
-    'description' => 'Set the time the timesheet reminder will be sent.',
-    'type' => MENU_LOCAL_TASK,
-  );
-  return $item;
 }
 
 /**
@@ -169,4 +197,274 @@ function manatime_feature_timesheets_create_timesheet_reminder() {
     // Function from the message_notify module, to send the message.
     message_notify_send_message($message);
   }
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function manatime_feature_timesheets_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner === 'ctools' && $plugin_type === 'content_types') {
+    return 'plugins/content_types';
+  }
+  if ($owner === 'ctools' && $plugin_type === 'relationships') {
+    return 'plugins/relationships';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function manatime_feature_timesheets_theme() {
+  return array(
+    'timesheet-view' => array(
+      'variables' => array(
+        'records' => array(),
+        'add_row_link' => '',
+      ),
+      'template' => 'timesheet-view',
+      'path' => drupal_get_path('module', 'manatime_feature_timesheets') . '/themes',
+    ),
+  );
+}
+
+/**
+ * Add a new row in the current timesheet.
+ */
+function manatime_feature_timesheets_add_row_form($form, &$form_state) {
+  $node = $form_state['build_info']['args'][0];
+  $timesheet = new Timesheet($node);
+  // Get the list of options to the dropdown project.
+  $options_project = timesheet_get_projects_options($timesheet);
+  // Selected default option to the dropdown project.
+  $selected = isset($form_state['values']['project']) ? $form_state['values']['project'] : key($options_project);
+  $form['project'] = array(
+    '#type' => 'select',
+    '#title' => t('Project'),
+    '#options' => $options_project,
+    '#default_value' => $selected,
+    '#ajax' => array(
+      'callback' => 'refresh_tasks_callback',
+      'wrapper' => 'field_task',
+    ),
+  );
+  $form['task'] = array(
+    '#type' => 'select',
+    '#title' => t('Task'),
+    // Create the section to update in the DOM.
+    '#prefix' => '<div id="field_task">',
+    '#suffix' => '</div>',
+    '#options' => timesheet_get_tasks_options($selected, $timesheet),
+    '#default_value' => isset($form_state['values']['task']) ? $form_state['values']['task'] : '',
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add'),
+  );
+  return $form;
+}
+
+/**
+ * Remove a row in the current timesheet.
+ */
+function manatime_feature_timesheets_remove_row_form($form, &$form_state) {
+  $form['alert'] = array(
+    '#type' => 'item',
+    '#title' => t('Are you sure you want to delete records?'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Remove'),
+  );
+  return $form;
+}
+
+/**
+ * Helper function to make a link add row.
+ */
+function manatime_feature_timesheet_make_link_add_row($node) {
+  ctools_include('modal');
+  ctools_modal_add_js();
+  return l(t('Add row'), 'timesheet/add-new-form/' . $node->nid . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+}
+
+/**
+ * Helper function to make a link remove row.
+ */
+function manatime_feature_timesheet_make_link_remove_row($node, $id_task) {
+  ctools_include('modal');
+  ctools_modal_add_js();
+  return l(t('Remove row'), 'timesheet/remove-row-form/' . $node->nid . '/' . $id_task . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+}
+
+/**
+ * Helper function to populate the project dropdown.
+ */
+function timesheet_get_projects_options($timesheet) {
+  $list = array();
+  $query = new EntityFieldQuery();
+  // Get only active projects with tasks.
+  $result = $query
+    ->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'projects')
+    ->fieldCondition('field_active', 'value', 1, '=')
+    ->fieldCondition('field_tasks', 'target_id', 'NULL', '!=')
+    ->execute();
+  if (isset($result['node'])) {
+    $nids = array_keys($result['node']);
+    // Load only the projects with available tasks, if all the project's tasks
+    // has been reported, the project will be blocked.
+    $blocked_nids = $timesheet->getBlockedProjects();
+    $projects = node_load_multiple(array_diff($nids, $blocked_nids));
+  }
+  foreach ($projects as $project) {
+    // Get only projects with tasks.
+    if (isset($project->field_tasks[LANGUAGE_NONE])) {
+      $list[$project->nid] = $project->title;
+    }
+  }
+  return $list;
+}
+
+/**
+ * Helper function to populate the task dropdown.
+ */
+function timesheet_get_tasks_options($project_id, $timesheet) {
+  $list = array();
+  $nids = array();
+  $project = node_load($project_id);
+  // Get the ids of tasks.
+  foreach ($project->field_tasks[LANGUAGE_NONE] as $nid) {
+    $nids[] = $nid['target_id'];
+  }
+  $tasks = node_load_multiple($nids);
+  foreach ($tasks as $task) {
+    // Get only the tasks not recorded in the reports.
+    if (empty($timesheet->getTimeEntriesPerTask($task->nid))) {
+      $list[$task->nid] = $task->title;
+    }
+  }
+  return $list;
+}
+
+/**
+ * Ajax menu callback - Add row.
+ */
+function manatime_feature_timesheets_add_row_callback($node, $ajax) {
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+      'title' => t('Add new row'),
+    );
+    $form_state['build_info']['args'] = array($node);
+
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+    $output = ctools_modal_form_wrapper('manatime_feature_timesheets_add_row_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output = $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  }
+  else {
+    return drupal_get_form('manatime_feature_timesheets_add_row_form');
+  }
+}
+
+/**
+ * Ajax menu callback - Remove row.
+ */
+function manatime_feature_timesheets_remove_row_callback($node, $task_id, $ajax) {
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+      'title' => t('Remove row'),
+    );
+
+    $form_state['build_info']['args'] = array($node, $task_id);
+
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+    $output = ctools_modal_form_wrapper('manatime_feature_timesheets_remove_row_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output = $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  }
+  else {
+    return drupal_get_form('manatime_feature_timesheets_remove_row_form');
+  }
+}
+
+/**
+ * Update the section to the dropdown task.
+ */
+function refresh_tasks_callback($form, $form_state) {
+  return $form['task'];
+}
+
+/**
+ * Drupal form submit handler.
+ */
+function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
+  // Generate the new link using the submitted text value.
+  $node = $form_state['build_info']['args'][0];
+  $timesheet = new Timesheet($node);
+  $timesheet->generateRecords();
+  $project = entity_metadata_wrapper('node', $form_state['complete form']['project']['#value']);
+  $task = entity_metadata_wrapper('node', $form_state['complete form']['task']['#value']);
+  // Add new row.
+  $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->getIdentifier());
+  $timesheet->addRecord($project->label(), $task->label(), array(), 0, $remove_link_row);
+
+  $records = $timesheet->getRecords();
+  $variables = array(
+    'id_timesheet' => $node->nid,
+    'records' => $records,
+    'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
+  );
+  $markup = theme('timesheet-view', $variables);
+  // Tell the browser to close the modal.
+  $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
+  // Tell the browser to replace the old link with the new one.
+  $form_state['ajax_commands'][] = ajax_command_replace('#time-entries-main', $markup);
+}
+
+/**
+ * Drupal form submit handler.
+ */
+function manatime_feature_timesheets_remove_row_form_submit(&$form, &$form_state) {
+  $node = $form_state['build_info']['args'][0];
+  $timesheet = new Timesheet($node);
+  $timesheet->generateRecords();
+  $timesheet->removeRecord($form_state['build_info']['args'][1]);
+  $timesheet->generateRecords();
+  $records = $timesheet->getRecords();
+  $variables = array(
+    'id_timesheet' => $node->nid,
+    'records' => $records,
+    'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
+  );
+  $markup = theme('timesheet-view', $variables);
+  // Tell the browser to close the modal.
+  $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
+  // Tell the browser to replace the old link with the new one.
+  $form_state['ajax_commands'][] = ajax_command_replace('#time-entries-main', $markup);
 }
