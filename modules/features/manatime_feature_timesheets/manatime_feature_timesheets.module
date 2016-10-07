@@ -37,14 +37,13 @@ function manatime_feature_timesheets_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $item['admin/config/manatime/timesheet-reminder'] = array(
+  $items['admin/config/manatime/timesheet-reminder'] = array(
     'title' => 'Timesheet reminder',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('manatime_feature_timesheets_form'),
     'access callback' => array('manatime_feature_timesheets_permission'),
     'description' => 'Set the time the timesheet reminder will be sent.',
     'type' => MENU_LOCAL_TASK,
-
   );
 
   return $items;
@@ -164,7 +163,7 @@ function manatime_feature_timesheets_cron() {
 }
 
 /**
- * Send an email to each of the users who have not submitted the timesheet.
+ * Send an email to each user who have not submitted the timesheet.
  */
 function manatime_feature_timesheets_create_timesheet_reminder() {
 
@@ -218,6 +217,9 @@ function manatime_feature_timesheets_ctools_plugin_directory($owner, $plugin_typ
   if ($owner === 'ctools' && $plugin_type === 'relationships') {
     return 'plugins/relationships';
   }
+  if ($owner === 'ctools' && $plugin_type === 'access') {
+    return 'plugins/access';
+  }
 }
 
 /**
@@ -228,9 +230,9 @@ function manatime_feature_timesheets_theme() {
     'timesheet-view' => array(
       'variables' => array(
         'timesheet_id' => '',
-        'timesheet_title' => '',
         'records' => array(),
         'add_row_link' => '',
+        'submit_link' => '',
       ),
       'template' => 'timesheet-view',
       'path' => drupal_get_path('module', 'manatime_feature_timesheets') . '/themes',
@@ -310,7 +312,9 @@ function manatime_feature_timesheets_submit_form($form, &$form_state) {
 function manatime_feature_timesheet_make_link_add_row($node) {
   ctools_include('modal');
   ctools_modal_add_js();
-  return l(t('Add row'), 'timesheet/add-new-form/' . $node->nid . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+  if ($node->status == 0) {
+    return l(t('Add row'), 'timesheet/add-new-form/' . $node->nid . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+  }
 }
 
 /**
@@ -319,7 +323,20 @@ function manatime_feature_timesheet_make_link_add_row($node) {
 function manatime_feature_timesheet_make_link_remove_row($node, $id_task) {
   ctools_include('modal');
   ctools_modal_add_js();
-  return l(t('Remove row'), 'timesheet/remove-row-form/' . $node->nid . '/' . $id_task . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+  if ($node->status == 0) {
+    return l(t('Remove row'), 'timesheet/remove-row-form/' . $node->nid . '/' . $id_task . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+  }
+}
+
+/**
+ * Helper function to make the submit link.
+ */
+function manatime_feature_timesheet_make_submit_link($node) {
+  ctools_include('modal');
+  ctools_modal_add_js();
+  if ($node->status == 0) {
+    return l(t('Submit timesheet'), 'timesheet/submit-timesheet/' . $node->nid . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+  }
 }
 
 /**
@@ -497,9 +514,9 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
   $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
-    'timesheet_title' => $node->title,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
+    'submit_link' => manatime_feature_timesheet_make_submit_link($node),
   );
   $markup = theme('timesheet-view', $variables);
   // Tell the browser to close the modal.
@@ -520,9 +537,9 @@ function manatime_feature_timesheets_remove_row_form_submit(&$form, &$form_state
   $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
-    'timesheet_title' => $node->title,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
+    'submit_link' => manatime_feature_timesheet_make_submit_link($node),
   );
   $markup = theme('timesheet-view', $variables);
   // Tell the browser to close the modal.
@@ -562,9 +579,9 @@ function manatime_feature_timesheets_submit_form_submit(&$form, &$form_state) {
 
       $variables = array(
         'timesheet_id' => $new_timesheet->nid,
-        'timesheet_title' => $new_timesheet->title,
         'records' => array(),
         'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
+        'submit_link' => manatime_feature_timesheet_make_submit_link($node),
       );
       $markup = theme('timesheet-view', $variables);
     }
@@ -579,4 +596,14 @@ function manatime_feature_timesheets_submit_form_submit(&$form, &$form_state) {
     $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
   }
 
+}
+
+/**
+ * Checks whether the text has a correct date format.
+ */
+function validate_date_format($str_date) {
+  if (date('Ymd', strtotime($str_date)) == $str_date) {
+    return TRUE;
+  }
+  return FALSE;
 }

@@ -8,7 +8,6 @@
 
  <main id="time-entries-main">
 
-   <?php print $timesheet_title ?>
    <?php if (empty($records)): ?>
      <p>Empty.</p>
    <?php else: ?>
@@ -57,5 +56,5 @@
        </table>
      <?php endif; ?>
    <?php print $add_row_link; ?>
-   <?php print '<a href="timesheet/submit-timesheet/' . $timesheet_id . '/nojs" class="ctools-use-modal">' . t('Submit timesheet') . '</a>';?>
+   <?php print $submit_link;?>
  </main>

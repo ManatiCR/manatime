@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Demo content type.
+ * Timesheet view content type.
  */
 
 $plugin = array(
@@ -34,9 +34,9 @@ function timesheet_view_render($subtype, $conf, $panel_args, $context) {
       'content' => array(
         '#theme' => 'timesheet-view',
         '#timesheet_id' => $node->nid,
-        '#timesheet_title' => $node->title,
         '#records' => $records,
         '#add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
+        '#submit_link' => manatime_feature_timesheet_make_submit_link($node),
       ),
     );
     return $block;
