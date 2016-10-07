@@ -14,33 +14,77 @@ $plugin = array(
   'keyword' => 'node',
   'context' => 'timesheet_node_from_user_context',
   'edit form' => 'timesheet_node_from_user_settings_form',
-  'required context' => new ctools_context_required(t('User'), 'entity:user'),
+  'required context' => array(
+    new ctools_context_required(t('User'), 'entity:user'),
+    new ctools_context_required(t('String'), 'string'),
+  ),
 );
 
 /**
  * Return a new context based on an existing context.
  */
 function timesheet_node_from_user_context($context, $conf) {
-  if (empty($context->data)) {
+  if (empty($context[0]->data)) {
     return ctools_context_create_empty('entity:node', NULL);
   }
-  if (date('w') == 1) {
-    $beginning = new DateTime('now');
+
+  $uid = $context[0]->data->uid;
+  // If the url does not have dates, get the current week's timesheet.
+  if (empty($context[1]->data)) {
+    $beginning = date('w') == 1 ? new DateTime('now') : new DateTime('last monday');
+    $end = $beginning->getTimestamp() + 576000;
+    $dates = array($beginning->format('Y-m-d'), gmdate('Y-m-d', $end));
+    return get_timesheet(0, $dates, $dates, 'BETWEEN', $uid);
   }
+
   else {
-    $beginning = new DateTime('last monday');
+    // Get the timesheets with dates given.
+    $dates = explode("-", $context[1]->data);
+    if (validate_date_format($dates[0]) && validate_date_format($dates[1])) {
+      $beginning = (new DateTime($dates[0]))->format('Y-m-d');
+      $end = (new DateTime($dates[1]))->format('Y-m-d');
+      return get_timesheet(array(1, 0), $beginning, $end, '=', $uid);
+    }
+    else {
+      return ctools_context_create_empty('entity:node', NULL);
+    }
   }
-  $end = $beginning->getTimestamp() + 576000;
-  $uid = $context->data->uid;
+}
+
+/**
+ * Empty form on purpose.
+ */
+function timesheet_node_from_user_settings_form($form, $form_state) {
+  $conf = $form_state['conf'];
+  return $form;
+}
+
+/**
+ * Get timesheet.
+ *
+ * @param string $status
+ *   The Timesheet's status, possible values: 0 or array(0, 1).
+ * @param string $beginning
+ *   Beginning date, possible values: date or array(dates).
+ * @param string $end
+ *   End date, possible values: date or array(dates).
+ * @param string $condition
+ *   Condition to compare, possible values: '=' or 'BETWEEN'.
+ * @param string $uid
+ *   The timesheet user's id owner.
+ *
+ * @return node
+ *   If the function found a sheet it return it,
+ *   otherwise it return a null node.
+ */
+function get_timesheet($status, $beginning, $end, $condition, $uid) {
   $query = new EntityFieldQuery();
   $result = $query
     ->entityCondition('entity_type', 'node')
     ->entityCondition('bundle', 'timesheet')
-    ->propertyCondition('status', 0)
-    ->fieldCondition('field_date', 'value', array(
-      $beginning->format('Y-m-d'),
-      gmdate('Y-m-d', $end),
-    ), 'BETWEEN')
+    ->propertyCondition('status', $status)
+    ->fieldCondition('field_date', 'value', $beginning, $condition)
+    ->fieldCondition('field_date', 'value2', $end, $condition)
     ->fieldCondition('field_user', 'target_id', $uid, '=')
     ->execute();
 
@@ -52,13 +96,4 @@ function timesheet_node_from_user_context($context, $conf) {
   else {
     return ctools_context_create_empty('entity:node', NULL);
   }
-
-}
-
-/**
- * Empty form on purpose.
- */
-function timesheet_node_from_user_settings_form($form, $form_state) {
-  $conf = $form_state['conf'];
-  return $form;
 }
