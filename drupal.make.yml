@@ -77,6 +77,8 @@ projects:
     version: "3.14"
   views_bulk_operations:
     version: "3.3"
+  views_pdf:
+    version: "1.5"
   # Themes.
   adminimal_theme:
     version: "1.24"
