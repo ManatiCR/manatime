@@ -556,46 +556,42 @@ function manatime_feature_timesheets_submit_form_submit(&$form, &$form_state) {
   $node = $form_state['build_info']['args'][0];
   $timesheet = new Timesheet($node);
   if (!empty($timesheet->getTimeEntries())) {
-    $timesheet->fillTimeEntries();
-    $timesheet->submit();
-    // Checks whether or not the timesheet was submitted the sunday.
-    if (date('N') == 7) {
-      $markup = 'Your timesheet has been submitted.';
+    $today = new DateTime('now 00:00:00');
+    $beginning = new DateTime($node->field_date[LANGUAGE_NONE][0]['value']);
+    $end = new DateTime($node->field_date[LANGUAGE_NONE][0]['value2']);
+
+    // If today is the sheet's end, it will not create a new timesheet.
+    if ($today->getTimestamp() == $end->getTimestamp() ||
+      $today->getTimestamp() > $end->getTimestamp()) {
     }
-    else {
-      // Create a new timesheet for the rest of the week.
-      $beginning = new DateTime('now');
-      $end = new DateTime('next sunday');
+
+    // Check if it will create a timesheet for the rest of current week.
+    elseif ($today->getTimestamp() >= $beginning->getTimestamp() &&
+        $today->getTimestamp() <= $end->getTimestamp()) {
+      // Change the end date and title of the current timesheet.
+      $node->field_date[LANGUAGE_NONE][0]['value2'] = $today->format('Y-m-d H:i:s');
+      $node->title = 'Timesheet from: ' . $beginning->format('F d, Y') . ' to: ' . $today->format('F d, Y');
+      node_save($node);
+      // Create new timesheet.
       $new_timesheet = new stdClass();
-      $new_timesheet->title = 'Timesheet from: ' . $beginning->format('F d, Y') . ' to: ' . $end->format('F d, Y');
+      $new_timesheet->title = 'Timesheet from: ' . $today->format('F d, Y') . ' to: ' . $end->format('F d, Y');
       $new_timesheet->type = 'timesheet';
-      $new_timesheet->field_date[LANGUAGE_NONE][0]['value'] = $beginning->format('Y-m-d H:i:s');
+      $new_timesheet->field_date[LANGUAGE_NONE][0]['value'] = $today->format('Y-m-d H:i:s');
       $new_timesheet->field_date[LANGUAGE_NONE][0]['value2'] = $end->format('Y-m-d H:i:s');
       $new_timesheet->field_user[LANGUAGE_NONE][0]['target_id'] = $user->uid;
       node_object_prepare($new_timesheet);
-      node_save($new_timesheet);
       $new_timesheet->status = 0;
       node_save($new_timesheet);
-
-      $variables = array(
-        'timesheet_id' => $new_timesheet->nid,
-        'records' => array(),
-        'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
-        'submit_link' => manatime_feature_timesheet_make_submit_link($node),
-      );
-      $markup = theme('timesheet-view', $variables);
     }
-    // Tell the browser to close the modal.
-    $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
-    // Tell the browser to replace the old link with the new one.
-    $form_state['ajax_commands'][] = ajax_command_replace('#time-entries-main', $markup);
+    $timesheet->fillTimeEntries();
+    $timesheet->submit();
+    drupal_set_message(t('Your timesheet has been submitted successfully.'), 'status');
   }
   else {
-    drupal_set_message(t('This timesheet does not have time entries.'), 'error');
-    // Tell the browser to close the modal.
-    $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
+    drupal_set_message(t('Your timesheet does not have time entries.'), 'error');
   }
-
+  $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
+  $form_state['ajax_commands'][] = ctools_ajax_command_reload();
 }
 
 /**
