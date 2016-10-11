@@ -562,7 +562,7 @@ function manatime_feature_timesheets_submit_form_submit(&$form, &$form_state) {
     $beginning = new DateTime($node->field_date[LANGUAGE_NONE][0]['value']);
     $end = new DateTime($node->field_date[LANGUAGE_NONE][0]['value2']);
     // Check if it will create a timesheet for the rest of current week.
-    elseif ($today->getTimestamp() >= $beginning->getTimestamp() &&
+    if ($today->getTimestamp() >= $beginning->getTimestamp() &&
         $today->getTimestamp() <= $end->getTimestamp()) {
       // Change the end date and title of the current timesheet.
       $node->field_date[LANGUAGE_NONE][0]['value2'] = $today->format('Y-m-d H:i:s');
