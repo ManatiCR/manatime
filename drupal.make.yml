@@ -106,10 +106,5 @@ libraries:
   fpdi:
     download:
       type: "file"
-      url: "http://www.setasign.de/supra/kon2_dl/60111/FPDI-1.4.4.zip"
+      url: "https://www.setasign.com/downloads/103845/FPDI-1.6.1.zip"
       directory_name: "fpdi"
-  fpdf_tpl:
-    download:
-      type: "file"
-      url: "https://gist.githubusercontent.com/josue2591/d063858370ad73c8d8157bafa3472a6e/raw/32b5a9b56ba899cb32d6005e1e0815dfdb3b09f9/fpdf_tpl.php"
-      subdir: "fpdi"
