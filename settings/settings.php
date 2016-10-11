@@ -38,6 +38,7 @@ $conf['master_modules']['base'] = array(
   'ctools',
   'date_api',
   'entity',
+  'entity_token',
   'features',
   'fences',
   'link',
@@ -63,6 +64,7 @@ $conf['master_modules']['base'] = array(
   'manatime_feature_tasks',
   'manatime_feature_time_entries',
   'manatime_feature_timesheets',
+  'manatime_feature_timesheet_reminders',
   'manatime_feature_users',
 );
 
@@ -115,3 +117,7 @@ if (file_exists(DRUPAL_ROOT . '/sites/default/settings.local.php')) {
 
 // Manatime Theme.
 $conf['theme_default'] = 'manatime_theme';
+
+$conf['mail_system'] = array(
+  'default-system' => 'DevelMailLog',
+);
