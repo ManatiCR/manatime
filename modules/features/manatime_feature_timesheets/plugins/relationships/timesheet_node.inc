@@ -32,18 +32,23 @@ function timesheet_node_from_user_context($context, $conf) {
   // If the url does not have dates, get the current week's timesheet.
   if (empty($context[1]->data)) {
     $beginning = date('w') == 1 ? new DateTime('now') : new DateTime('last monday');
+    /*
+     * $end = $beginning->getTimestamp()(Monday's number of seconds)
+     * + 576000(seven days in seconds).
+     */
     $end = $beginning->getTimestamp() + 576000;
     $dates = array($beginning->format('Y-m-d'), gmdate('Y-m-d', $end));
-    return get_timesheet(0, $dates, $dates, 'BETWEEN', $uid);
+    return manatime_get_timesheet(0, $dates, $dates, 'BETWEEN', $uid);
   }
 
   else {
     // Get the timesheets with dates given.
     $dates = explode("-", $context[1]->data);
-    if (validate_date_format($dates[0]) && validate_date_format($dates[1])) {
+    if (DateTime::createFromFormat('Ymd', $dates[0])
+      && DateTime::createFromFormat('Ymd', $dates[1])) {
       $beginning = (new DateTime($dates[0]))->format('Y-m-d');
       $end = (new DateTime($dates[1]))->format('Y-m-d');
-      return get_timesheet(array(1, 0), $beginning, $end, '=', $uid);
+      return manatime_get_timesheet(array(1, 0), $beginning, $end, '=', $uid);
     }
     else {
       return ctools_context_create_empty('entity:node', NULL);
@@ -77,7 +82,7 @@ function timesheet_node_from_user_settings_form($form, $form_state) {
  *   If the function found a sheet it return it,
  *   otherwise it return a null node.
  */
-function get_timesheet($status, $beginning, $end, $condition, $uid) {
+function manatime_get_timesheet($status, $beginning, $end, $condition, $uid) {
   $query = new EntityFieldQuery();
   $result = $query
     ->entityCondition('entity_type', 'node')

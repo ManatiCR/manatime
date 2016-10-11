@@ -24,7 +24,8 @@ function dates_access_check($conf, $context) {
     return FALSE;
   }
   $dates = explode("-", $context[0]->data);
-  if (validate_date_format($dates[0]) && validate_date_format($dates[1])) {
+  if (DateTime::createFromFormat('Ymd', $dates[0])
+    && DateTime::createFromFormat('Ymd', $dates[1])) {
     $beginning = new DateTime($dates[0]);
     $end = new DateTime($dates[1]);
     $query = new EntityFieldQuery();
@@ -46,5 +47,5 @@ function dates_access_check($conf, $context) {
  * Provides a plugin summary.
  */
 function dates_access_summary($conf, $context) {
-  return t('Show only if the url has a validate dates');
+  return t('Show only if the url has valid dates.');
 }
