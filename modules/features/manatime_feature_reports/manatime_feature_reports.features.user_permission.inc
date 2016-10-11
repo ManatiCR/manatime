@@ -10,9 +10,9 @@
 function manatime_feature_reports_user_default_permissions() {
   $permissions = array();
 
-  // Exported permission: 'See and export reports reports'.
-  $permissions['See and export reports reports'] = array(
-    'name' => 'See and export reports reports',
+  // Exported permission: 'See and export reports'.
+  $permissions['See and export reports'] = array(
+    'name' => 'See and export reports',
     'roles' => array(
       'administrator' => 'administrator',
       'super admin' => 'super admin',

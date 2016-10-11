@@ -11,7 +11,7 @@ include_once 'manatime_feature_reports.features.inc';
  */
 function manatime_feature_reports_permission() {
   return array(
-    'See and export reports reports' => array(
+    'See and export reports' => array(
       'title' => t('See and export reports'),
       'description' => t('Allow see and export reports.'),
     ),
