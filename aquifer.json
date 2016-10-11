@@ -67,10 +67,7 @@
         "drush fra -y"
       ]
     },
-    "postBuild": [
-      "mv ./build/sites/all/libraries/fpdf_tpl/fpdf_tpl.php ./build/sites/all/libraries/fpdi",
-      "rm -rf ./build/sites/all/libraries/fpdf_tpl"
-    ]
+    "postBuild": []
   },
   "extensions": {
     "aquifer-git": {
