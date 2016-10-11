@@ -30,6 +30,7 @@ vagrant plugin install vagrant-auto_network
 Prepare the local site:
 
 * `composer install`
+* `cd .vendor/drush/drush ; composer install`
 * `npm install`
 * `node_modules/.bin/aquifer extensions-load`
 * `node_modules/.bin/aquifer build`

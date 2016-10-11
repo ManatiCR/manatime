@@ -49,6 +49,8 @@ projects:
     version: "1.2"
   inline_entity_form:
     version: "1.8"
+  jquery_update:
+    version: "2.7"
   libraries:
     version: "2.3"
   link:
@@ -96,8 +98,11 @@ libraries:
       url: "http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.5.4/ckeditor_4.5.4_standard.zip"
   tcpdf:
     download:
+      type: "git"
       url: "https://github.com/tecnickcom/TCPDF.git"
       directory_name: "tcpdf"
+      branch: "master"
+      revision: "009f2304c3a9c8152b89a5321a8825f250911dc3"
   fpdi:
     download:
       type: "file"
@@ -106,5 +111,5 @@ libraries:
   fpdf_tpl:
     download:
       type: "file"
-      url: "http://www.setasign.de/supra/kon2_dl/63411/FPDF_TPL-1.2.3.zip"
-      directory_name: "fpdi"
+      url: "https://gist.githubusercontent.com/josue2591/d063858370ad73c8d8157bafa3472a6e/raw/32b5a9b56ba899cb32d6005e1e0815dfdb3b09f9/fpdf_tpl.php"
+      subdir: "fpdi"
