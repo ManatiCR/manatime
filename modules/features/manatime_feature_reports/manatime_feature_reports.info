@@ -3,7 +3,6 @@ core = 7.x
 package = manatime
 version = 7.x-1.0
 dependencies[] = date_popup
-dependencies[] = date_popup_timepicker
 dependencies[] = date_views
 dependencies[] = features
 dependencies[] = manatime_feature_reports

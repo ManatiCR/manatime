@@ -4,7 +4,6 @@ package = manatime
 version = 7.x-1.4
 dependencies[] = date
 dependencies[] = date_popup
-dependencies[] = date_popup_timepicker
 dependencies[] = entityreference
 dependencies[] = features
 dependencies[] = list
