@@ -247,7 +247,7 @@ function manatime_feature_reports_views_default_views() {
   $export['report_summary_collaborators'] = $view;
 
   $view = new view();
-  $view->name = 'report_test';
+  $view->name = 'report_summary_projects';
   $view->description = '';
   $view->tag = 'default';
   $view->base_table = 'node';
@@ -502,7 +502,7 @@ function manatime_feature_reports_views_default_views() {
     'page' => 'page',
     'default' => 0,
   );
-  $export['report_test'] = $view;
+  $export['report_summary_projects'] = $view;
 
   return $export;
 }
