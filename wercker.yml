@@ -24,7 +24,7 @@ build:
             # Configure Drush.
             mkdir -p ~/.drush
             cp ./wercker/manatime.aliases.drushrc.php ~/.drush
-            ln -s ~/.composer/.vendor/bin/drush /usr/bin/drush
+            ln -s ~/.composer/vendor/bin/drush /usr/bin/drush
             # Drupal settings.
             cp ./wercker/wercker.settings.secret.php ./settings/settings.secret.php
             # Configure Solr.
@@ -105,7 +105,7 @@ deploy:
             composer install --prefer-source --no-interaction
             npm install
             composer global require drush/drush:7.1.* --no-interaction
-            ln -s ~/.composer/.vendor/bin/drush /usr/bin/drush
+            ln -s ~/.composer/vendor/bin/drush /usr/bin/drush
     - script:
         name: Install Pantheon CLI
         code: |
@@ -160,7 +160,7 @@ deploy-test:
             composer install --prefer-source --no-interaction
             npm install
             composer global require drush/drush:7.1.* --no-interaction
-            ln -s ~/.composer/.vendor/bin/drush /usr/bin/drush
+            ln -s ~/.composer/vendor/bin/drush /usr/bin/drush
     - script:
         name: Install Pantheon CLI
         code: |
@@ -212,7 +212,7 @@ deploy-live:
             composer install --prefer-source --no-interaction
             npm install
             composer global require drush/drush:7.1.* --no-interaction
-            ln -s ~/.composer/.vendor/bin/drush /usr/bin/drush
+            ln -s ~/.composer/vendor/bin/drush /usr/bin/drush
     - script:
         name: Install Pantheon CLI
         code: |
@@ -263,7 +263,7 @@ deploy-multidev:
             composer install --prefer-source --no-interaction
             npm install
             composer global require drush/drush:7.1.* --no-interaction
-            ln -s ~/.composer/.vendor/bin/drush /usr/bin/drush
+            ln -s ~/.composer/vendor/bin/drush /usr/bin/drush
     - script:
         name: Install Pantheon CLI
         code: |
