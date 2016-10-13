@@ -289,7 +289,7 @@ function manatime_feature_timesheets_add_time_entry_form($form, &$form_state, $n
     '#title' => t('Description'),
     '#type' => 'textarea',
     '#required' => TRUE,
-    '#default_value' => !empty($entry) ? t($parameters['description']) : '',
+    '#default_value' => !empty($entry) ? $parameters['description'] : '',
   );
   $form['node'] = array(
     "#type" => 'value',
@@ -338,7 +338,7 @@ function manatime_feature_timesheet_modal_entry_link($node, $parameters, $text_l
   ctools_modal_add_js();
   if ($node->status == NODE_NOT_PUBLISHED) {
     $path = 'timesheet/modal-time-entry-form/' . $node->nid . '/nojs';
-    return l(t($text_link), $path, array(
+    return l($text_link, $path, array(
       'attributes' => array(
         'class' => 'ctools-use-modal',
         'title' => $text_title,
