@@ -21,9 +21,9 @@ function manatime_feature_timesheets_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['timesheet/add-time-entry-form/%node/%/%/%/%ctools_js'] = array(
-    'page callback' => 'manatime_feature_timesheets_add_time_entry_callback',
-    'page arguments' => array(2, 3, 4, 5, 6),
+  $items['timesheet/modal-time-entry-form/%node/%ctools_js'] = array(
+    'page callback' => 'manatime_feature_timesheets_modal_time_entry_callback',
+    'page arguments' => array(2, 3),
     'access callback' => 'manatime_feature_timesheet_validate_user',
     'access arguments' => array(2),
     'type' => MENU_CALLBACK,
@@ -275,23 +275,33 @@ function manatime_feature_timesheets_add_row_form($form, &$form_state) {
 /**
  * Add a new row in the current timesheet.
  */
-function manatime_feature_timesheets_add_time_entry_form($form, &$form_state) {
+function manatime_feature_timesheets_add_time_entry_form($form, &$form_state, $node) {
+  $parameters = drupal_get_query_parameters();
+  $entry = !empty($parameters['time_entry_id']) ? $parameters['time_entry_id'] : NULL;
   $form['duration'] = array(
     '#type' => 'textfield',
     '#title' => t('Duration'),
     '#size' => 60,
-    '#maxlength' => 128,
     '#required' => TRUE,
+    '#default_value' => !empty($entry) ? $parameters['duration'] : '',
   );
   $form['description'] = array(
     '#title' => t('Description'),
     '#type' => 'textarea',
-    '#maxlength' => 128,
     '#required' => TRUE,
+    '#default_value' => !empty($entry) ? t($parameters['description']) : '',
+  );
+  $form['node'] = array(
+    "#type" => 'value',
+    "#value" => $node,
+  );
+  $form['entry'] = array(
+    "#type" => 'value',
+    "#value" => !empty($entry) ? $parameters['time_entry_id'] : '',
   );
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Add time entry'),
+    '#value' => !empty($entry) ? t('Update time entry') : t('Add time entry'),
   );
   return $form;
 }
@@ -318,6 +328,24 @@ function manatime_feature_timesheet_make_link_add_row($node) {
   ctools_include('modal');
   ctools_modal_add_js();
   return l(t('Add row'), 'timesheet/add-new-form/' . $node->nid . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
+}
+
+/**
+ * Helper function to make a link time entry.
+ */
+function manatime_feature_timesheet_modal_entry_link($node, $parameters, $text_link, $text_title) {
+  ctools_include('modal');
+  ctools_modal_add_js();
+  if ($node->status == NODE_NOT_PUBLISHED) {
+    $path = 'timesheet/modal-time-entry-form/' . $node->nid . '/nojs';
+    return l(t($text_link), $path, array(
+      'attributes' => array(
+        'class' => 'ctools-use-modal',
+        'title' => $text_title,
+      ), 'query' => $parameters,
+    ));
+    // E/.
+  }
 }
 
 /**
@@ -415,22 +443,17 @@ function manatime_feature_timesheets_add_row_callback($node, $ajax) {
 /**
  * Ajax menu callback - Add row.
  */
-function manatime_feature_timesheets_add_time_entry_callback($node, $project_id, $task_id, $number_day, $ajax) {
+function manatime_feature_timesheets_modal_time_entry_callback($node, $ajax) {
   if ($ajax) {
     ctools_include('ajax');
     ctools_include('modal');
 
     $form_state = array(
       'ajax' => TRUE,
-      'title' => t('Add time entry'),
+      'title' => t('time entry'),
     );
 
-    $form_state['build_info']['args'] = array(
-      $node,
-      $project_id,
-      $task_id,
-      $number_day,
-    );
+    $form_state['build_info']['args'] = array($node);
 
     // Use ctools to generate ajax instructions for the browser to create
     // a form in a modal popup.
@@ -447,7 +470,7 @@ function manatime_feature_timesheets_add_time_entry_callback($node, $project_id,
     drupal_exit();
   }
   else {
-    return drupal_get_form('manatime_feature_timesheets_add_time_entry_form');
+    return drupal_get_form('manatime_feature_timesheets_add_time_entry_form', $node);
   }
 }
 
@@ -500,16 +523,17 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
   $node = $form_state['build_info']['args'][0];
   $timesheet = new Timesheet($node);
   $timesheet->generateRecords();
-  $project = entity_metadata_wrapper('node', $form_state['complete form']['project']['#value']);
-  $task = entity_metadata_wrapper('node', $form_state['complete form']['task']['#value']);
+  $project = node_load($form_state['complete form']['project']['#value']);
+  $task = node_load($form_state['complete form']['task']['#value']);
   // Add new row.
-  $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->getIdentifier());
-  $timesheet->addRecord($project->label(), $task->label(), array(), 0, $remove_link_row);
+  $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->nid);
+
+  $timesheet->addRecord($project, $task, array(), 0, $remove_link_row);
   $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
     'records' => $records,
-    'add_row_link' => manatime_feature_timesheet_make_link_add_row($timesheet->getNid()),
+    'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
   );
   $markup = theme('timesheet-view', $variables);
   // Tell the browser to close the modal.
@@ -522,25 +546,23 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
  * Drupal form submit handler - Add time entry.
  */
 function manatime_feature_timesheets_add_time_entry_form_submit(&$form, &$form_state) {
-  $node = $form_state['build_info']['args'][0];
+  $node = $form_state['values']['node'];
   $timesheet = new Timesheet($node);
-  $timesheet->generateRecords();
-  if (date('w') == 1) {
-    $monday = new DateTime('now');
-  }
-  else {
-    $monday = new DateTime('last monday');
-  }
-  // Amount of days = (day selected - less the present day) * (day in seconds).
-  $amount_of_days = ($form_state['build_info']['args'][3] - 1) * 86400;
-  // Time entry data.
   $description = $form_state['complete form']['description']['#value'];
   $duration = $form_state['complete form']['duration']['#value'];
-  $id_project = $form_state['build_info']['args'][1];
-  $id_task = $form_state['build_info']['args'][2];
-  // Date = last monday + amount of days.
-  $date = $monday->getTimestamp() + $amount_of_days;
-  $timesheet->addTimeEntry($description, $duration, $id_project, $id_task, $date);
+  $timesheet->generateRecords();
+  $parameters = drupal_get_query_parameters();
+  if (empty($parameters['time_entry_id'])) {
+    $project_id = $parameters['project_id'];
+    $task_id = $parameters['task_id'];
+    $date = $parameters['date'];
+    $timesheet->addTimeEntry($description, $duration, $project_id, $task_id, $date);
+  }
+  else {
+    $entry = $parameters['time_entry_id'];
+    $timesheet->editTimeEntry($entry, $description, $duration);
+  }
+
   $timesheet->generateRecords();
   $records = $timesheet->getRecords();
   $variables = array(
