@@ -296,9 +296,23 @@ function manatime_feature_timesheets_remove_row_form($form, &$form_state, $node)
  * Timesheet submit form.
  */
 function manatime_feature_timesheets_submit_form($form, &$form_state, $node) {
+  $user = entity_metadata_wrapper('user', $node->uid);
+  $weekly_hours = $user->field_weekly_hours->value();
+
+  $timesheet = new Timesheet($node);
+  $hours_registered = $timesheet->getHoursWorked($timesheet->getTimeEntries());
+  $message = t('Are you sure you want to submit your timesheet?');
+
+  if ($hours_registered < $weekly_hours) {
+    $message = t('Are you sure you want to register @registered hours?, you should
+    register @weekly hours per week. ', array(
+      '@registered' => $hours_registered,
+      '@weekly' => $weekly_hours,
+    )) . $message;
+  }
   $form['description'] = array(
     '#type' => 'item',
-    '#title' => t('Are you sure you want to submit your timesheet?'),
+    '#title' => $message,
   );
   $form['node'] = array(
     "#type" => 'value',
