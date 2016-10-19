@@ -224,6 +224,13 @@ function manatime_feature_timesheets_theme() {
       'template' => 'timesheet-view',
       'path' => drupal_get_path('module', 'manatime_feature_timesheets') . '/themes',
     ),
+    'timesheet-daily-view' => array(
+      'variables' => array(
+        'time_entries' => array(),
+      ),
+      'template' => 'timesheet-daily-view',
+      'path' => drupal_get_path('module', 'manatime_feature_timesheets') . '/themes',
+    ),
   );
 }
 

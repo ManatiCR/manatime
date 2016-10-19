@@ -6,7 +6,7 @@
  */
 
 /**
- * Description to the array $plugin.
+ * Plugin array's description.
  */
 $plugin = array(
   'title' => t('Timesheet node'),
