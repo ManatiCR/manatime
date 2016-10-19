@@ -294,13 +294,17 @@ class Timesheet {
 
   /**
    * Returns the task's entries separate per day.
+   *
+   * @param string $project
+   *   A object type project.
+   * @param string $task
+   *   A object type task.
+   * @param int $task_entries
+   *   An array with the task's time entries.
    */
   public function getTaskEntriesPerDays($project, $task, $task_entries) {
     $record_entries = array();
-    $beginning = $this->node->field_date['und'][0]['value'];
-    $end = $this->node->field_date['und'][0]['value2'];
-    for ($date = $beginning; $date <= $end;
-      $date = date("Y-m-d H:i:s", strtotime($date . "+ 1 days"))) {
+    foreach ($this->getTimesheetDays() as $date) {
       $day_entries = $this->getTimeEntriesPerDay($date, $task_entries);
       // The day's time entry.
       if (!empty($day_entries)) {
@@ -328,6 +332,24 @@ class Timesheet {
       $record_entries[$day_name] = $link_entry;
     }
     return $record_entries;
+  }
+
+  /**
+   * Return array with the timesheet's dates.
+   *
+   * @return array
+   *   The timesheet's dates.
+   */
+  public function getTimesheetDays() {
+    $timesheetDays = array();
+    $beginning = $this->node->field_date['und'][0]['value'];
+    $end = $this->node->field_date['und'][0]['value2'];
+    for ($date = $beginning; $date <= $end;
+      $date = date("Y-m-d H:i:s", strtotime($date . "+ 1 days"))) {
+      $day_name = date("l", strtotime($date));
+      $timesheetDays[$day_name] = date("Y-m-d H:i:s", strtotime($date));
+    }
+    return $timesheetDays;
   }
 
   /**
