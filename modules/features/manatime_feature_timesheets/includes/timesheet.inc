@@ -100,6 +100,26 @@ class Timesheet {
   }
 
   /**
+   * Get time_entries array.
+   *
+   * @return array
+   *   The timesheet's time entries array.
+   */
+  public function getTimeEntriesArray($timeEntries) {
+    $time_entries = array();
+    foreach ($timeEntries as $time_entry) {
+      $time_entry = entity_metadata_wrapper('node', $time_entry);
+      $time_entries[] = array(
+        'project' => check_plain($time_entry->field_project->label()),
+        'task' => check_plain($time_entry->field_task->label()),
+        'description' => check_plain($time_entry->body->value->value()),
+        'duration' => check_plain($time_entry->field_duration->value()),
+      );
+    }
+    return $time_entries;
+  }
+
+  /**
    * Set projects.
    */
   public function fillProjects() {
