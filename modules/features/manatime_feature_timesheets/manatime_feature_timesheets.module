@@ -156,7 +156,7 @@ function manatime_feature_timesheets_cron() {
 }
 
 /**
- * Send an email to each user who have not submitted the timesheet.
+ * Send an email to each user who has not submitted the timesheet.
  */
 function manatime_feature_timesheets_create_timesheet_reminder() {
 
