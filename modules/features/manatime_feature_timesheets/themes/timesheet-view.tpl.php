@@ -7,7 +7,6 @@
  ?>
 
  <main id="time-entries-main">
-
    <?php if (empty($records)): ?>
      <p>Empty.</p>
    <?php else: ?>
