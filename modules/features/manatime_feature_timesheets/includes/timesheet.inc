@@ -338,15 +338,15 @@ class Timesheet {
    *   The timesheet's dates.
    */
   public function getTimesheetDays() {
-    $timesheetDays = array();
+    $timesheet_days = array();
     $beginning = $this->node->field_date['und'][0]['value'];
     $end = $this->node->field_date['und'][0]['value2'];
     for ($date = $beginning; $date <= $end;
       $date = date("Y-m-d H:i:s", strtotime($date . "+ 1 days"))) {
       $day_name = date("l", strtotime($date));
-      $timesheetDays[$day_name] = date("Y-m-d H:i:s", strtotime($date));
+      $timesheet_days[$day_name] = date("Y-m-d H:i:s", strtotime($date));
     }
-    return $timesheetDays;
+    return $timesheet_days;
   }
 
   /**
