@@ -74,7 +74,12 @@ function dates_navigation_render($subtype, $conf, $panel_args, $context) {
       $next_timesheet = l(t('Next'), 'timesheet/' . $beginning->format('Ymd') . '-' . $end->format('Ymd'));
       $items[] = array('data' => $next_timesheet);
     }
-    $content = theme('item_list', array('items' => $items), NULL, 'ul');
+    $content = theme_item_list(array(
+      'items' => $items,
+      'title' => NULL,
+      'type' => 'ul',
+      'attributes' => array('class' => 'links_navegation_dates'),
+    ));
 
     // Build the content type block.
     $block = new stdClass();
