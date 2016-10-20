@@ -135,7 +135,7 @@ function manatime_feature_timesheets_cron() {
       $uid = $record->uid;
       // Create a node associated to the user's id.
       $title = 'Timesheet from: ' . $beginning->format('F d, Y') . ' to: ' . gmdate('F d, Y', $end);
-      create_timesheet($title, $beginning->format('Y-m-d H:i:s'), gmdate('Y-m-d H:i:s', $end), $uid);
+      manatime_create_timesheet($title, $beginning->format('Y-m-d H:i:s'), gmdate('Y-m-d H:i:s', $end), $uid);
     }
     // Set the varible to the next time the function must execute itself.
     variable_set('manatime_feature_timesheets_execution_time', $next_execution_time);
@@ -584,7 +584,7 @@ function manatime_feature_timesheets_submit_form_submit(&$form, &$form_state) {
       node_save($node);
       // Create timesheet.
       $title = 'Timesheet from: ' . $today->format('F d, Y') . ' to: ' . $end->format('F d, Y');
-      create_timesheet($title, $today->format('Y-m-d H:i:s'), $end->format('Y-m-d H:i:s'), $user->uid);
+      manatime_create_timesheet($title, $today->format('Y-m-d H:i:s'), $end->format('Y-m-d H:i:s'), $user->uid);
     }
     $timesheet->fillTimeEntries();
     $timesheet->submit();
@@ -600,7 +600,7 @@ function manatime_feature_timesheets_submit_form_submit(&$form, &$form_state) {
 /**
  * Create a timesheet node.
  */
-function create_timesheet($title, $beginning, $end, $uid) {
+function manatime_create_timesheet($title, $beginning, $end, $uid) {
   $new_timesheet = new stdClass();
   $new_timesheet->title = $title;
   $new_timesheet->type = 'timesheet';
