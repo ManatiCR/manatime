@@ -278,20 +278,21 @@ function manatime_feature_timesheets_add_row_form($form, &$form_state) {
  */
 function manatime_feature_timesheets_time_entry_form($form, &$form_state, $node) {
   $query = drupal_get_query_parameters();
+  $entry = !empty($query['time_entry_id']) ? node_load($query['time_entry_id']) : NULL;
 
   $form['duration'] = array(
     '#type' => 'textfield',
     '#title' => t('Duration'),
     '#size' => 60,
     '#required' => TRUE,
-    '#default_value' => !empty($query['duration']) ? $query['duration'] : '',
+    '#default_value' => !is_null($entry) ? $entry->field_duration[LANGUAGE_NONE][0]['value'] : '',
   );
 
   $form['description'] = array(
     '#title' => t('Description'),
     '#type' => 'textarea',
     '#required' => TRUE,
-    '#default_value' => !empty($query['description']) ? $query['description'] : '',
+    '#default_value' => !is_null($entry) ? $entry->body[LANGUAGE_NONE][0]['value'] : '',
   );
 
   $form['node'] = array(
@@ -306,7 +307,22 @@ function manatime_feature_timesheets_time_entry_form($form, &$form_state, $node)
     ),
   );
 
-  if (empty($query['time_entry_id'])) {
+  if (is_null($entry)) {
+    $form['project'] = array(
+      "#type" => 'value',
+      "#value" => $query['project_id'],
+    );
+
+    $form['task'] = array(
+      "#type" => 'value',
+      "#value" => $query['task_id'],
+    );
+
+    $form['date'] = array(
+      "#type" => 'value',
+      "#value" => $query['date'],
+    );
+
     $form['actions']['add'] = array(
       '#type' => 'submit',
       '#value' => t('Add'),
@@ -315,7 +331,7 @@ function manatime_feature_timesheets_time_entry_form($form, &$form_state, $node)
   else {
     $form['entry'] = array(
       "#type" => 'value',
-      "#value" => !empty($entry) ? $query['time_entry_id'] : '',
+      "#value" => $entry,
     );
 
     $form['actions']['edit'] = array(
@@ -374,7 +390,7 @@ function manatime_feature_timesheet_make_link_add_row($node) {
 /**
  * Helper function to make a link time entry.
  */
-function manatime_feature_timesheet_modal_entry_link($node, $parameters, $text_link, $text_title) {
+function manatime_feature_timesheet_modal_entry_link($node, $parameters, $text_link = 'Add', $text_title = '') {
   ctools_include('modal');
   ctools_modal_add_js();
   if ($node->status == NODE_NOT_PUBLISHED) {
@@ -594,22 +610,21 @@ function manatime_feature_timesheets_time_entry_form_submit(&$form, &$form_state
   $description = $form_state['values']['description'];
   $duration = $form_state['values']['duration'];
   $timesheet->generateRecords();
-  $query = drupal_get_query_parameters();
 
   if ($form_state['triggering_element']['#value'] === 'Delete') {
-    node_delete($query['time_entry_id']);
+    $entry = $form_state['values']['entry'];
+    node_delete($entry->nid);
   }
 
-  if ($form_state['triggering_element']['#value'] === 'Add') {
-    $project_id = $query['project_id'];
-    $task_id = $query['task_id'];
-    $date = $query['date'];
+  elseif ($form_state['triggering_element']['#value'] === 'Add') {
+    $project_id = $form_state['values']['project'];
+    $task_id = $form_state['values']['task'];
+    $date = $form_state['values']['date'];
     $timesheet->addTimeEntry($description, $duration, $project_id, $task_id, $date);
   }
 
   elseif ($form_state['triggering_element']['#value'] === 'Edit') {
-    $entry = $query['time_entry_id'];
-    $timesheet->editTimeEntry($entry, $description, $duration);
+    $timesheet->editTimeEntry($form_state['values']['entry'], $description, $duration);
   }
 
   $timesheet->generateRecords();

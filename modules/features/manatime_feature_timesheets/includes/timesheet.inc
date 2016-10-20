@@ -116,8 +116,8 @@ class Timesheet {
   /**
    * Edit time_entry.
    */
-  public function editTimeEntry($entry_id, $description, $duration) {
-    $wrapper = entity_metadata_wrapper('node', $entry_id);
+  public function editTimeEntry($entry, $description, $duration) {
+    $wrapper = entity_metadata_wrapper('node', $entry);
     $wrapper->body->value = $description;
     $wrapper->field_duration = $duration;
     $wrapper->save();
@@ -313,23 +313,20 @@ class Timesheet {
         $text_link = check_plain($entry->field_duration[LANGUAGE_NONE][0]['value']);
         $parameters = array(
           'time_entry_id' => $entry->nid,
-          'description' => check_plain($entry->body[LANGUAGE_NONE][0]['value']),
-          'duration' => check_plain($entry->field_duration[LANGUAGE_NONE][0]['value']),
         );
+        $link_entry = manatime_feature_timesheet_modal_entry_link($this->node,
+        $parameters, $text_link, $text_title);
       }
       else {
-        $text_link = 'Add';
-        $text_title = '';
         $parameters = array(
           'project_id' => $project->nid,
           'task_id' => $task->nid,
           'date' => check_plain(strtotime($date)),
         );
+        $link_entry = manatime_feature_timesheet_modal_entry_link($this->node,
+        $parameters);
       }
-      $link_entry = manatime_feature_timesheet_modal_entry_link($this->node,
-      $parameters, $text_link, $text_title);
-      $day_name = date("l", strtotime($date));
-      $record_entries[$day_name] = $link_entry;
+      $record_entries[] = $link_entry;
     }
     return $record_entries;
   }
