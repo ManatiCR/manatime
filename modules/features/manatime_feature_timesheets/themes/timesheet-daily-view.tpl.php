@@ -15,7 +15,6 @@
         <th><?php print t('Duration'); ?></th>
       </tr>
     </thead>
-    <?php print $test; ?>
     <tbody>
       <?php if (!empty($time_entries)): ?>
         <?php foreach ($time_entries as $time_entry): ?>
