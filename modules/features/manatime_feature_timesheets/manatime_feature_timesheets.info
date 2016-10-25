@@ -20,6 +20,7 @@ features[field_instance][] = node-timesheet-field_time_entries
 features[field_instance][] = node-timesheet-field_user
 features[node][] = timesheet
 features[page_manager_pages][] = timesheet
+features[page_manager_pages][] = timesheet_daily
 features[variable][] = field_bundle_settings_node__timesheet
 features[variable][] = menu_options_timesheet
 features[variable][] = menu_parent_timesheet
