@@ -209,6 +209,9 @@ function manatime_feature_timesheets_ctools_plugin_directory($owner, $plugin_typ
   if ($owner === 'ctools' && $plugin_type === 'relationships') {
     return 'plugins/relationships';
   }
+  if ($owner === 'ctools' && $plugin_type === 'access') {
+    return 'plugins/access';
+  }
 }
 
 /**
