@@ -14,6 +14,7 @@ $plugin = array(
   'category' => t('Manatime'),
   'required context' => array(
     new ctools_context_required(t('Timesheet'), 'entity:node'),
+    new ctools_context_required(t('String'), 'string'),
   ),
 );
 
@@ -21,21 +22,29 @@ $plugin = array(
  * Callback timesheet_daily_view_render.
  */
 function timesheet_daily_view_render($subtype, $conf, $panel_args, $context) {
-  // Build the content type block.
-  $node = $context[0]->data;
-  $timesheet = new Timesheet($node);
-  $current_date = (new DateTime('now 00:00'))->format('Y-m-d H:i:s');
-  $current_entries = $timesheet->getTimeEntriesPerDay($current_date);
-  $time_entries = $timesheet->getTimeEntriesArray($current_entries);
-  $test = $timesheet->getDateLinks();
-  $block = new stdClass();
-  $block->title = '';
-  $block->content = array(
-    'content' => array(
-      '#theme' => 'timesheet-daily-view',
-      '#time_entries' => $time_entries,
-      '#test' => $test,
-    ),
-  );
-  return $block;
+  if (isset($context[0]->data)) {
+    // Build the content type block.
+    $node = $context[0]->data;
+    $timesheet = new Timesheet($node);
+    if (isset($context[1]->data)) {
+      if (DateTime::createFromFormat('Ymd', $context[1]->data)) {
+        $day = date('Y-m-d H:i:s', strtotime($context[1]->data));
+        $entries = $timesheet->getTimeEntriesPerDay($day);
+      }
+    }
+    else {
+      $current_date = (new DateTime('now 00:00'))->format('Y-m-d H:i:s');
+      $entries = $timesheet->getTimeEntriesPerDay($current_date);
+    }
+    $time_entries = $timesheet->getTimeEntriesArray($entries);
+    $block = new stdClass();
+    $block->title = '';
+    $block->content = array(
+      'content' => array(
+        '#theme' => 'timesheet-daily-view',
+        '#time_entries' => $time_entries,
+      ),
+    );
+    return $block;
+  }
 }
