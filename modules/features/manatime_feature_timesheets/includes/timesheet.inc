@@ -105,18 +105,18 @@ class Timesheet {
    * @return array
    *   The timesheet's time entries array.
    */
-  public function getTimeEntriesArray($timeEntries) {
-    $time_entries = array();
-    foreach ($timeEntries as $time_entry) {
+  public function getTimeEntriesArray($time_entries) {
+    $time_entries_array = array();
+    foreach ($time_entries as $time_entry) {
       $time_entry = entity_metadata_wrapper('node', $time_entry);
-      $time_entries[] = array(
+      $time_entries_array[] = array(
         'project' => check_plain($time_entry->field_project->label()),
         'task' => check_plain($time_entry->field_task->label()),
         'description' => check_plain($time_entry->body->value->value()),
         'duration' => check_plain($time_entry->field_duration->value()),
       );
     }
-    return $time_entries;
+    return $time_entries_array;
   }
 
   /**
@@ -300,6 +300,36 @@ class Timesheet {
   }
 
   /**
+   * Return array with the timesheet's dates.
+   *
+   * @return array
+   *   The timesheet's dates.
+   */
+  public function getTimesheetDays() {
+    $timesheet_days = array();
+    $beginning = $this->node->field_date['und'][0]['value'];
+    $end = $this->node->field_date['und'][0]['value2'];
+    for ($date = $beginning; $date <= $end;
+      $date = date("Y-m-d H:i:s", strtotime($date . "+ 1 days"))) {
+      $day_name = date("l", strtotime($date));
+      $timesheet_days[$day_name] = date("Y-m-d H:i:s", strtotime($date));
+    }
+    return $timesheet_days;
+  }
+
+  /**
+   * AMm.
+   */
+  public function getTimesheetDaysLinks() {
+    $day_links = array();
+    foreach ($this->getTimesheetDays() as $dayname => $day) {
+      $day = date("Ymd", strtotime($day));
+      $day_links[] = $previous_timesheet = l(t($dayname), 'timesheet/daily/' . $day);
+    }
+    return $day_links;
+  }
+
+  /**
    * Get records.
    *
    * @return array
@@ -323,7 +353,7 @@ class Timesheet {
    * @param string $remove_link_row
    *   A link to remove the record.
    */
-  public function addRecord($project, $task, $time_entries, $total_hours_worked, $remove_link_row) {
+  public function addRecord($project, $task, array $time_entries, $total_hours_worked, $remove_link_row) {
     $this->records[] = array(
       'project' => check_plain($project),
       'task' => check_plain($task),
