@@ -29,7 +29,9 @@ function timesheet_daily_view_navegation_render($subtype, $conf, $panel_args, $c
       'items' => $timesheet->getTimesheetDaysLinks(),
       'title' => NULL,
       'type' => 'ul',
-      'attributes' => array('class' => 'daily_view_nav'),));
+      'attributes' => array('class' => 'daily_view_nav'),
+    )
+    );
     $block = new stdClass();
     $block->title = '';
     $block->content = array(

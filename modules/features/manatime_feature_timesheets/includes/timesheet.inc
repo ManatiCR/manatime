@@ -318,13 +318,13 @@ class Timesheet {
   }
 
   /**
-   * AMm.
+   * Return the links for the daily view navegation.
    */
   public function getTimesheetDaysLinks() {
     $day_links = array();
     foreach ($this->getTimesheetDays() as $dayname => $day) {
       $day = date("Ymd", strtotime($day));
-      $day_links[] = $previous_timesheet = l(t($dayname), 'timesheet/daily/' . $day);
+      $day_links[] = $previous_timesheet = l(t('@dayname', array('@dayname' => $dayname)), 'timesheet/daily/' . $day);
     }
     return $day_links;
   }

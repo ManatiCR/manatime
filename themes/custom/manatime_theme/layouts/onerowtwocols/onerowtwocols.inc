@@ -1,6 +1,10 @@
 <?php
 
-// Plugin definition
+/**
+ * @file
+ * Plugin declaration.
+ */
+
 $plugin = array(
   'title' => t('One row two column'),
   'category' => t('Two colums layout'),
