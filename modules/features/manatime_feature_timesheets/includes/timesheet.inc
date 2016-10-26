@@ -110,10 +110,10 @@ class Timesheet {
     foreach ($time_entries as $time_entry) {
       $time_entry = entity_metadata_wrapper('node', $time_entry);
       $time_entries_array[] = array(
-        'project' => check_plain($time_entry->field_project->label()),
-        'task' => check_plain($time_entry->field_task->label()),
-        'description' => check_plain($time_entry->body->value->value()),
-        'duration' => check_plain($time_entry->field_duration->value()),
+        'project' => $time_entry->field_project->label(),
+        'task' => $time_entry->field_task->label(),
+        'description' => $time_entry->body->value->value(),
+        'duration' => $time_entry->field_duration->value(),
       );
     }
     return $time_entries_array;
