@@ -227,7 +227,7 @@ function manatime_feature_timesheets_theme() {
     'timesheet-view' => array(
       'variables' => array(
         'timesheet_id' => '',
-        'timesheet_days' => array(),
+        'table_headers' => array(),
         'records' => array(),
         'add_row_link' => '',
       ),
@@ -586,11 +586,13 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
   $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->nid);
 
   $timesheet->addRecord($project, $task, array(), 0, $remove_link_row);
-  $timesheet_days = $timesheet->getTimesheetDays();
+  $table_headers = array_keys($timesheet->getTimesheetDays());
+  array_unshift($table_headers, t('Description'));
+  array_push($table_headers, t('Total'));
   $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
-    'timesheet_days' => $timesheet_days,
+    'table_headers' => $table_headers,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
   );
@@ -628,11 +630,13 @@ function manatime_feature_timesheets_time_entry_form_submit(&$form, &$form_state
   }
 
   $timesheet->generateRecords();
-  $timesheet_days = $timesheet->getTimesheetDays();
+  $table_headers = array_keys($timesheet->getTimesheetDays());
+  array_unshift($table_headers, t('Description'));
+  array_push($table_headers, t('Total'));
   $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
-    'timesheet_days' => $timesheet_days,
+    'table_headers' => $table_headers,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
   );
@@ -655,11 +659,13 @@ function manatime_feature_timesheets_remove_row_form_submit(&$form, &$form_state
   $records = $timesheet->getRecords();
 
   $timesheet->generateRecords();
-  $timesheet_days = $timesheet->getTimesheetDays();
+  $table_headers = array_keys($timesheet->getTimesheetDays());
+  array_unshift($table_headers, t('Description'));
+  array_push($table_headers, t('Total'));
   $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
-    'timesheet_days' => $timesheet_days,
+    'table_headers' => $table_headers,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
   );

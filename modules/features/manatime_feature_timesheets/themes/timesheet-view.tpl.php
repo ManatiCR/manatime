@@ -10,11 +10,9 @@
    <table class="time-time_entries-list">
      <thead>
        <tr>
-         <th><?php print t('Description'); ?></th>
-         <?php foreach (array_keys($timesheet_days) as $dayname): ?>
-           <th><?php print $dayname; ?></th>
+         <?php foreach ($table_headers as $header): ?>
+           <th><?php print $header; ?></th>
          <?php endforeach; ?>
-         <th><?php print t('Total'); ?></th>
        </tr>
      </thead>
      <tbody>
