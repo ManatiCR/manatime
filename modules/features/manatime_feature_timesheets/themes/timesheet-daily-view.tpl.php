@@ -9,10 +9,10 @@
   <table class="time-time_entries-list">
     <thead>
       <tr>
-        <th><?php print t('Project'); ?></th>
-        <th><?php print t('Task'); ?></th>
-        <th><?php print t('Description'); ?></th>
-        <th><?php print t('Duration'); ?></th>
+        <th><?php print $table_headers['project']; ?></th>
+        <th><?php print $table_headers['task']; ?></th>
+        <th><?php print $table_headers['description']; ?></th>
+        <th><?php print $table_headers['duration']; ?></th>
       </tr>
     </thead>
     <tbody>

@@ -37,12 +37,19 @@ function timesheet_daily_view_render($subtype, $conf, $panel_args, $context) {
       $entries = $timesheet->getTimeEntriesPerDay($current_date);
     }
     $time_entries = $timesheet->getTimeEntriesArray($entries);
+    $table_headers = array(
+      'project' => t('Project'),
+      'task' => t('Task'),
+      'description' => t('Description'),
+      'duration' => t('Duration'),
+    );
     $block = new stdClass();
     $block->title = '';
     $block->content = array(
       'content' => array(
         '#theme' => 'timesheet-daily-view',
         '#time_entries' => $time_entries,
+        '#table_headers' => $table_headers,
       ),
     );
     return $block;

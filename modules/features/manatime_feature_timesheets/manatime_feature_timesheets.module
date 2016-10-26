@@ -230,6 +230,7 @@ function manatime_feature_timesheets_theme() {
     'timesheet-daily-view' => array(
       'variables' => array(
         'time_entries' => array(),
+        'table_headers' => array(),
       ),
       'template' => 'timesheet-daily-view',
       'path' => drupal_get_path('module', 'manatime_feature_timesheets') . '/themes',
