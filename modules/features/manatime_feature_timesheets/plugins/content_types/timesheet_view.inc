@@ -28,7 +28,8 @@ function timesheet_view_render($subtype, $conf, $panel_args, $context) {
     $timesheet->generateRecords();
     $table_headers = array_keys($timesheet->getTimesheetDays());
     array_unshift($table_headers, t('Description'));
-    array_push($table_headers, t('Total'));    $records = $timesheet->getRecords();
+    array_push($table_headers, t('Total'));
+    $records = $timesheet->getRecords();
     // Build the content type block.
     $block = new stdClass();
     $block->title = '';
