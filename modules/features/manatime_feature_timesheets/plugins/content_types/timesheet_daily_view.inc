@@ -28,12 +28,12 @@ function timesheet_daily_view_render($subtype, $conf, $panel_args, $context) {
     $timesheet = new Timesheet($node);
     if (isset($context[1]->data)) {
       if (DateTime::createFromFormat('Ymd', $context[1]->data)) {
-        $day = date('Y-m-d H:i:s', strtotime($context[1]->data));
+        $day = date('Y-m-d', strtotime($context[1]->data));
         $entries = $timesheet->getTimeEntriesPerDay($day);
       }
     }
     else {
-      $current_date = (new DateTime('now 00:00'))->format('Y-m-d H:i:s');
+      $current_date = (new DateTime('now'))->format('Y-m-d');
       $entries = $timesheet->getTimeEntriesPerDay($current_date);
     }
     $time_entries = $timesheet->getTimeEntriesArray($entries);

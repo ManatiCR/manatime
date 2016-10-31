@@ -186,7 +186,9 @@ class Timesheet {
   public function getTimeEntriesPerDay($date) {
     $entries = array();
     foreach ($this->timeEntries as $entry) {
-      if ($entry->field_date[LANGUAGE_NONE][0]['value'] === $date) {
+      $entry_date = $entry->field_date[LANGUAGE_NONE][0]['value'];
+      $entry_date = date('Y-m-d', strtotime($entry_date));
+      if ($entry_date === $date) {
         $entries[] = $entry;
       }
     }
@@ -353,7 +355,7 @@ class Timesheet {
    * @param string $remove_link_row
    *   A link to remove the record.
    */
-  public function addRecord($project, $task, array $time_entries, $total_hours_worked, $remove_link_row) {
+  public function addRecord($project, $task, $time_entries, $total_hours_worked, $remove_link_row) {
     $this->records[] = array(
       'project' => check_plain($project),
       'task' => check_plain($task),
