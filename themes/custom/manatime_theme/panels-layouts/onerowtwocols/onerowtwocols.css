@@ -1,0 +1,13 @@
+.panel-1row2cols {
+	width: 100%;
+}
+.panel-1row2cols-row{
+	width: 100%;
+}
+
+.panel-1row2cols-left {
+	float: left;
+}
+.panel-1row2cols-right {
+	float: right;
+}

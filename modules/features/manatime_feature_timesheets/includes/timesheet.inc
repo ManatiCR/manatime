@@ -100,6 +100,26 @@ class Timesheet {
   }
 
   /**
+   * Get time_entries array.
+   *
+   * @return array
+   *   The timesheet's time entries array.
+   */
+  public function getTimeEntriesArray($time_entries) {
+    $time_entries_array = array();
+    foreach ($time_entries as $time_entry) {
+      $time_entry = entity_metadata_wrapper('node', $time_entry);
+      $time_entries_array[] = array(
+        'project' => $time_entry->field_project->label(),
+        'task' => $time_entry->field_task->label(),
+        'description' => $time_entry->body->value->value(),
+        'duration' => $time_entry->field_duration->value(),
+      );
+    }
+    return $time_entries_array;
+  }
+
+  /**
    * Set projects.
    */
   public function fillProjects() {
@@ -166,7 +186,9 @@ class Timesheet {
   public function getTimeEntriesPerDay($date) {
     $entries = array();
     foreach ($this->timeEntries as $entry) {
-      if ($entry->field_date[LANGUAGE_NONE][0]['value'] === $date) {
+      $entry_date = $entry->field_date[LANGUAGE_NONE][0]['value'];
+      $entry_date = date('Y-m-d', strtotime($entry_date));
+      if ($entry_date === $date) {
         $entries[] = $entry;
       }
     }
@@ -277,6 +299,36 @@ class Timesheet {
         $this->addRecord($project->title, $task->title, $record_entries, $total_hours_worked, $remove_link_row);
       }
     }
+  }
+
+  /**
+   * Return array with the timesheet's dates.
+   *
+   * @return array
+   *   The timesheet's dates.
+   */
+  public function getTimesheetDays() {
+    $timesheet_days = array();
+    $beginning = $this->node->field_date['und'][0]['value'];
+    $end = $this->node->field_date['und'][0]['value2'];
+    for ($date = $beginning; $date <= $end;
+      $date = date("Y-m-d H:i:s", strtotime($date . "+ 1 days"))) {
+      $day_name = date("l", strtotime($date));
+      $timesheet_days[$day_name] = date("Y-m-d H:i:s", strtotime($date));
+    }
+    return $timesheet_days;
+  }
+
+  /**
+   * Return the links for the daily view navegation.
+   */
+  public function getTimesheetDaysLinks() {
+    $day_links = array();
+    foreach ($this->getTimesheetDays() as $dayname => $day) {
+      $day = date("Ymd", strtotime($day));
+      $day_links[] = $previous_timesheet = l(t('@dayname', array('@dayname' => $dayname)), 'timesheet/daily/' . $day);
+    }
+    return $day_links;
   }
 
   /**
