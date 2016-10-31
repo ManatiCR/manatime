@@ -30,5 +30,5 @@ stylesheets[print][] = 'css/print.css'
 
 modernizr[tests][] = css_boxsizing
 
-; Panels layouts. You can place multiple layouts under the "layouts" folder.
-plugins[panels][layouts] = layouts
+; Panels layouts.
+plugins[panels][layouts] = panels-layouts
