@@ -54,7 +54,7 @@ function manatime_feature_timesheets_menu() {
  */
 function manatime_feature_timesheet_validate_user($node) {
   global $user;
-  return $node->uid === $user->uid;
+  return $node->field_user[LANGUAGE_NONE][0]['target_id'] === $user->uid;
 }
 
 /**
