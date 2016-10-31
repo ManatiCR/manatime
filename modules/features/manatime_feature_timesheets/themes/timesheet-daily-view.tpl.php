@@ -20,16 +20,16 @@
         <?php foreach ($time_entries as $time_entry): ?>
           <tr class="time-entry">
             <th>
-              <p class="time-entry--project"><?php print $time_entry['project']?></p>
+              <?php print $time_entry['project']?>
             </th>
             <th>
-              <p class="time-entry--task"><?php print $time_entry['task']?></p>
+              <?php print $time_entry['task']?>
             </th>
             <th>
-              <p class="time-entry--description"><?php print $time_entry['description']?></p>
+              <?php print $time_entry['description']?>
             </th>
             <th>
-              <p class="time-entry--duration"><?php print $time_entry['duration']?></p>
+              <?php print $time_entry['duration']?>
             </th>
           </tr>
         <?php endforeach; ?>
