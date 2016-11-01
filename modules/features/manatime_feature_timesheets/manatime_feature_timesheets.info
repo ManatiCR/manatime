@@ -21,6 +21,7 @@ features[field_instance][] = node-timesheet-field_time_entries
 features[field_instance][] = node-timesheet-field_user
 features[node][] = timesheet
 features[page_manager_pages][] = timesheet
+features[page_manager_pages][] = timesheet_daily
 features[user_permission][] = access content
 features[user_permission][] = create time_entries content
 features[user_permission][] = create timesheet content

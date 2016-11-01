@@ -134,6 +134,26 @@ class Timesheet {
   }
 
   /**
+   * Get time_entries array.
+   *
+   * @return array
+   *   The timesheet's time entries array.
+   */
+  public function getTimeEntriesArray($time_entries) {
+    $time_entries_array = array();
+    foreach ($time_entries as $time_entry) {
+      $time_entry = entity_metadata_wrapper('node', $time_entry);
+      $time_entries_array[] = array(
+        'project' => $time_entry->field_project->label(),
+        'task' => $time_entry->field_task->label(),
+        'description' => $time_entry->body->value->value(),
+        'duration' => $time_entry->field_duration->value(),
+      );
+    }
+    return $time_entries_array;
+  }
+
+  /**
    * Set projects.
    */
   public function fillProjects() {
@@ -199,8 +219,10 @@ class Timesheet {
    */
   public function getTimeEntriesPerDay($date, $time_entries) {
     $entries = array();
-    foreach ($time_entries as $entry) {
-      if ($entry->field_date[LANGUAGE_NONE][0]['value'] === $date) {
+    foreach ($this->timeEntries as $entry) {
+      $entry_date = $entry->field_date[LANGUAGE_NONE][0]['value'];
+      $entry_date = date('Y-m-d', strtotime($entry_date));
+      if ($entry_date === $date) {
         $entries[] = $entry;
       }
     }
@@ -347,6 +369,18 @@ class Timesheet {
       $timesheet_days[$day_name] = date("Y-m-d H:i:s", strtotime($date));
     }
     return $timesheet_days;
+  }
+
+  /**
+   * Return the links for the daily view navegation.
+   */
+  public function getTimesheetDaysLinks() {
+    $day_links = array();
+    foreach ($this->getTimesheetDays() as $dayname => $day) {
+      $day = date("Ymd", strtotime($day));
+      $day_links[] = $previous_timesheet = l(t('@dayname', array('@dayname' => $dayname)), 'timesheet/daily/' . $day);
+    }
+    return $day_links;
   }
 
   /**

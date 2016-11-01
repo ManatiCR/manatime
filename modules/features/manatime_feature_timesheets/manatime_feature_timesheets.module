@@ -217,6 +217,9 @@ function manatime_feature_timesheets_ctools_plugin_directory($owner, $plugin_typ
   if ($owner === 'ctools' && $plugin_type === 'relationships') {
     return 'plugins/relationships';
   }
+  if ($owner === 'ctools' && $plugin_type === 'access') {
+    return 'plugins/access';
+  }
 }
 
 /**
@@ -232,6 +235,14 @@ function manatime_feature_timesheets_theme() {
         'add_row_link' => '',
       ),
       'template' => 'timesheet-view',
+      'path' => drupal_get_path('module', 'manatime_feature_timesheets') . '/themes',
+    ),
+    'timesheet-daily-view' => array(
+      'variables' => array(
+        'time_entries' => array(),
+        'table_headers' => array(),
+      ),
+      'template' => 'timesheet-daily-view',
       'path' => drupal_get_path('module', 'manatime_feature_timesheets') . '/themes',
     ),
   );
