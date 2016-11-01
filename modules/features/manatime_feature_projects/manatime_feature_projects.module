@@ -61,13 +61,13 @@ function manatime_feature_projects_action_info() {
   );
 }
 
-/*
+/**
  * Implements hook_field_widget_form_alter().
  */
 function manatime_feature_projects_field_widget_form_alter(&$element, &$form_state, $context) {
   if ($form_state['build_info']['form_id'] == 'projects_node_form' && empty($element['#entity']->nid)) {
     if ($element['#field_name'] === 'field_tasks') {
-      if(empty($form_state['default_tasks_loaded'])) {
+      if (empty($form_state['default_tasks_loaded'])) {
         $form_state['default_tasks_loaded'] = TRUE;
         $form_id = $element['#ief_id'];
         $default_tasks = variable_get('manatime_default_task', array());
@@ -97,7 +97,7 @@ function manatime_feature_projects_field_widget_form_alter(&$element, &$form_sta
           $element['entities'][$delta]['delta'] = array(
             '#type' => 'weight',
             '#default_value' => $delta,
-            '#delta' => 50, // TODO CHANGE.
+            '#delta' => 50,
             '#attributes' => array('class' => array('ief-entity-delta')),
           );
           $element['entities'][$delta]['actions'] = array(
@@ -237,14 +237,12 @@ function manatime_feature_projects_form($form, &$form_state) {
 }
 
 /**
- * Submit handler for "Add another task" button on
- * Manatime_feature_projects_form().
+ * Submit handler for "Add another task" on Manatime_feature_projects_form().
  */
 function manatime_feature_projects_add_task($form, &$form_state) {
   // Everything in $form_state is persistent, so we'll just use
-  // $form_state['add_task']
+  // $form_state['add_task'].
   $form_state['num_tasks']++;
-
   // Setting $form_state['rebuild'] = TRUE causes the form to be rebuilt again.
   $form_state['rebuild'] = TRUE;
 }
