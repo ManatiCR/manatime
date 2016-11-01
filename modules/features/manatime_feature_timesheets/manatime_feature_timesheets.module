@@ -600,7 +600,7 @@ function manatime_feature_timesheets_submit_form_submit(&$form, &$form_state) {
 /**
  * Create a timesheet node.
  */
-function manatime_create_timesheet($title, $beginning, $end, $uid) {
+function manatime_feature_timesheet_create_timesheet($title, $beginning, $end, $uid) {
   $new_timesheet = new stdClass();
   $new_timesheet->title = $title;
   $new_timesheet->type = 'timesheet';
