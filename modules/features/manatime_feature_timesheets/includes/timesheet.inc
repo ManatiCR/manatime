@@ -382,7 +382,7 @@ class Timesheet {
       $table_headers[] = t('@dayname', array('@dayname' => $day_name));
     }
     $table_headers[] = t('Total');
-    return $day_links;
+    return $table_headers;
   }
 
   /**
