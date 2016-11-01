@@ -23,6 +23,21 @@ function manatime_feature_projects_permission() {
 }
 
 /**
+ * Implements hook_menu().
+ */
+function manatime_feature_projects_menu() {
+  $item['admin/config/manatime/default-tasks'] = array(
+    'title' => 'Default tasks',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('manatime_feature_projects_form'),
+    'access callback' => array('manatime_feature_projects_permission'),
+    'description' => 'Add default .',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $item;
+}
+
+/**
  * Implements hook_action_info().
  */
 function manatime_feature_projects_action_info() {
@@ -46,84 +61,83 @@ function manatime_feature_projects_action_info() {
   );
 }
 
-/**
+/*
  * Implements hook_field_widget_form_alter().
  */
 function manatime_feature_projects_field_widget_form_alter(&$element, &$form_state, $context) {
-  $default_tasks = variable_get('manatime_default_task', array());
-
   if ($form_state['build_info']['form_id'] == 'projects_node_form' && empty($element['#entity']->nid)) {
     if ($element['#field_name'] === 'field_tasks') {
+      if(empty($form_state['default_tasks_loaded'])) {
+        $form_state['default_tasks_loaded'] = TRUE;
+        $form_id = $element['#ief_id'];
+        $default_tasks = variable_get('manatime_default_task', array());
+        $form_state['field']['field_tasks'][LANGUAGE_NONE]['items_count'] = count($default_tasks);
 
-      $form_id = $element['#ief_id'];
-      $form_state['field']['field_tasks'][LANGUAGE_NONE]['items_count'] = count($default_tasks);
+        foreach ($default_tasks as $delta => $task) {
+          $node = new stdClass();
+          $node->title = $task['task'];
+          $node->field_billable[LANGUAGE_NONE][0]['value'] = $task['billable'];
+          $node->type = "tasks";
+          $node->language = LANGUAGE_NONE;
+          $node->is_new = TRUE;
+          $node->body[LANGUAGE_NONE][0]['format'] = 'plain_text';
+          $node->body[LANGUAGE_NONE][0]['value'] = $task['description'];
+          $node->body[LANGUAGE_NONE][0]['summary'] = '';
+          $node->status = NODE_PUBLISHED;
+          $node->validated = TRUE;
+          $node->actions = array();
+          $node->actions['ief_add_save'] = 'Create task';
+          $node->actions['ief_add_cancel'] = 'Cancel';
+          node_object_prepare($node);
 
-      foreach ($default_tasks as $delta => $task) {
-
-        $node = new stdClass();
-        $node->title = $task['task'];
-        $node->field_billable[LANGUAGE_NONE][0]['value'] = $task['billable'];
-        $node->type = "tasks";
-        $node->language = LANGUAGE_NONE;
-        $node->is_new = TRUE;
-        $node->body[LANGUAGE_NONE][0]['format'] = 'plain_text';
-        $node->body[LANGUAGE_NONE][0]['value'] = $task['description'];
-        $node->body[LANGUAGE_NONE][0]['summary'] = '';
-        $node->status = NODE_PUBLISHED;
-        $node->validated = TRUE;
-        $node->actions = array();
-        $node->actions['ief_add_save'] = 'Create task';
-        $node->actions['ief_add_cancel'] = 'Cancel';
-        node_object_prepare($node);
-
-        $element['entities'][$delta] = array();
-        $element['entities'][$delta]['#entity'] = $node;
-        $element['entities'][$delta]['#needs_save'] = TRUE;
-        $element['entities'][$delta]['#weight'] = $delta;
-        $element['entities'][$delta]['delta'] = array(
-          '#type' => 'weight',
-          '#default_value' => 0,
-          '#delta' => 50, // TODO CHANGE.
-          '#attributes' => array('class' => array('ief-entity-delta')),
-        );
-        $element['entities'][$delta]['actions'] = array(
-          '#type' => 'container',
-          '#attributes' => array('class' => array('ief-entity-operations')),
-          'ief_entity_edit' => array(
-            '#type' => 'submit',
-            '#value' => t('Edit'),
-            '#name' => 'ief-' . $form_id . '-entity-edit-' . $delta ,
-            '#limit_validation_errors' => array(),
-            '#ajax' => array(
-              'callback' => 'inline_entity_form_get_element',
-              'wrapper' => 'inline-entity-form-' . $form_id,
+          $element['entities'][$delta] = array();
+          $element['entities'][$delta]['#entity'] = $node;
+          $element['entities'][$delta]['#needs_save'] = TRUE;
+          $element['entities'][$delta]['#weight'] = $delta;
+          $element['entities'][$delta]['delta'] = array(
+            '#type' => 'weight',
+            '#default_value' => $delta,
+            '#delta' => 50, // TODO CHANGE.
+            '#attributes' => array('class' => array('ief-entity-delta')),
+          );
+          $element['entities'][$delta]['actions'] = array(
+            '#type' => 'container',
+            '#attributes' => array('class' => array('ief-entity-operations')),
+            'ief_entity_edit' => array(
+              '#type' => 'submit',
+              '#value' => t('Edit'),
+              '#name' => 'ief-' . $form_id . '-entity-edit-' . $delta ,
+              '#limit_validation_errors' => array(),
+              '#ajax' => array(
+                'callback' => 'inline_entity_form_get_element',
+                'wrapper' => 'inline-entity-form-' . $form_id,
+              ),
+              '#submit' => array('inline_entity_form_open_row_form'),
+              '#ief_row_delta' => $delta,
+              '#ief_row_form' => 'edit',
             ),
-            '#submit' => array('inline_entity_form_open_row_form'),
-            '#ief_row_delta' => $delta,
-            '#ief_row_form' => 'edit',
-          ),
-          'ief_entity_remove' => array(
-            '#type' => 'submit',
-            '#value' => t('Remove'),
-            '#name' => 'ief-' . $form_id . '-entity-remove-' . $delta ,
-            '#limit_validation_errors' => array(),
-            '#ajax' => array(
-              'callback' => 'inline_entity_form_get_element',
-              'wrapper' => 'inline-entity-form-' . $form_id,
+            'ief_entity_remove' => array(
+              '#type' => 'submit',
+              '#value' => t('Remove'),
+              '#name' => 'ief-' . $form_id . '-entity-remove-' . $delta,
+              '#limit_validation_errors' => array(),
+              '#ajax' => array(
+                'callback' => 'inline_entity_form_get_element',
+                'wrapper' => 'inline-entity-form-' . $form_id,
+              ),
+              '#submit' => array('inline_entity_form_open_row_form'),
+              '#ief_row_delta' => $delta,
+              '#ief_row_form' => 'remove',
             ),
-            '#submit' => array('inline_entity_form_open_row_form'),
-            '#ief_row_delta' => $delta,
-            '#ief_row_form' => 'remove',
-          ),
-        );
+          );
 
-        $form_state['inline_entity_form'][$form_id]['entities'][$delta] = array(
-          'entity' => $node,
-          'weight' => $delta,
-          'form' => NULL,
-          'needs_save' => TRUE,
-        );
-        $delta++;
+          $form_state['inline_entity_form'][$form_id]['entities'][$delta] = array(
+            'entity' => $node,
+            'weight' => $delta,
+            'form' => NULL,
+            'needs_save' => TRUE,
+          );
+        }
       }
     }
   }
@@ -244,19 +258,4 @@ function manatime_feature_projects_remove_task($form, &$form_state) {
   }
   // Setting $form_state['rebuild'] = TRUE causes the form to be rebuilt again.
   $form_state['rebuild'] = TRUE;
-}
-
-/**
- * Implements hook_menu().
- */
-function manatime_feature_projects_menu() {
-  $item['admin/config/manatime/default-tasks'] = array(
-    'title' => 'Default tasks',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('manatime_feature_projects_form'),
-    'access callback' => array('manatime_feature_projects_permission'),
-    'description' => 'Add default .',
-    'type' => MENU_LOCAL_TASK,
-  );
-  return $item;
 }
