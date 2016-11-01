@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Demo content type.
+ * Timesheet view content type.
  */
 
 $plugin = array(
@@ -26,9 +26,7 @@ function timesheet_view_render($subtype, $conf, $panel_args, $context) {
     $node = $context[0]->data;
     $timesheet = new Timesheet($node);
     $timesheet->generateRecords();
-    $table_headers = array_keys($timesheet->getTimesheetDays());
-    array_unshift($table_headers, t('Description'));
-    array_push($table_headers, t('Total'));
+    $table_headers = $timesheet->getTimesheetViewHeaders();
     $records = $timesheet->getRecords();
     // Build the content type block.
     $block = new stdClass();
