@@ -222,6 +222,7 @@ class Timesheet {
     foreach ($this->timeEntries as $entry) {
       $entry_date = $entry->field_date[LANGUAGE_NONE][0]['value'];
       $entry_date = date('Y-m-d', strtotime($entry_date));
+      $date = date('Y-m-d', strtotime($date));
       if ($entry_date === $date) {
         $entries[] = $entry;
       }
