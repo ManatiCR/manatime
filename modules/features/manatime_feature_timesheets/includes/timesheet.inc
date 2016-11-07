@@ -235,7 +235,7 @@ class Timesheet {
    */
   public function getTimeEntriesPerDay($date, $time_entries) {
     $entries = array();
-    foreach ($this->timeEntries as $entry) {
+    foreach ($time_entries as $entry) {
       $entry_date = $entry->field_date[LANGUAGE_NONE][0]['value'];
       $entry_date = date('Y-m-d', strtotime($entry_date));
       $date = date('Y-m-d', strtotime($date));
