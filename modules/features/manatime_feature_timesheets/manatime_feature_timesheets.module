@@ -254,33 +254,41 @@ function manatime_feature_timesheets_theme() {
 function manatime_feature_timesheets_add_row_form($form, &$form_state) {
   $node = $form_state['build_info']['args'][0];
   $timesheet = new Timesheet($node);
-  // Get the list of options to the dropdown project.
-  $options_project = timesheet_get_projects_options($timesheet);
-  // Selected default option to the dropdown project.
-  $selected = isset($form_state['values']['project']) ? $form_state['values']['project'] : key($options_project);
-  $form['project'] = array(
-    '#type' => 'select',
-    '#title' => t('Project'),
-    '#options' => $options_project,
-    '#default_value' => $selected,
-    '#ajax' => array(
-      'callback' => 'refresh_tasks_callback',
-      'wrapper' => 'field_task',
-    ),
-  );
-  $form['task'] = array(
-    '#type' => 'select',
-    '#title' => t('Task'),
-    // Create the section to update in the DOM.
-    '#prefix' => '<div id="field_task">',
-    '#suffix' => '</div>',
-    '#options' => timesheet_get_tasks_options($selected, $timesheet),
-    '#default_value' => isset($form_state['values']['task']) ? $form_state['values']['task'] : '',
-  );
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Add'),
-  );
+  if ($timesheet->blockNewRows()) {
+    $form['alert'] = array(
+      '#type' => 'item',
+      '#title' => t("You haven't projects available."),
+    );
+  }
+  else {
+    // Get the list of options to the dropdown project.
+    $options_project = timesheet_get_projects_options($timesheet);
+    // Selected default option to the dropdown project.
+    $selected = isset($form_state['values']['project']) ? $form_state['values']['project'] : key($options_project);
+    $form['project'] = array(
+      '#type' => 'select',
+      '#title' => t('Project'),
+      '#options' => $options_project,
+      '#default_value' => $selected,
+      '#ajax' => array(
+        'callback' => 'refresh_tasks_callback',
+        'wrapper' => 'field_task',
+      ),
+    );
+    $form['task'] = array(
+      '#type' => 'select',
+      '#title' => t('Task'),
+      // Create the section to update in the DOM.
+      '#prefix' => '<div id="field_task">',
+      '#suffix' => '</div>',
+      '#options' => timesheet_get_tasks_options($selected, $timesheet),
+      '#default_value' => isset($form_state['values']['task']) ? $form_state['values']['task'] : '',
+    );
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add'),
+    );
+  }
   return $form;
 }
 

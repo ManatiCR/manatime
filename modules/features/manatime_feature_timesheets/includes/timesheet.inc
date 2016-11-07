@@ -198,6 +198,22 @@ class Timesheet {
   }
 
   /**
+   * Block new rows.
+   *
+   * Block the function to add new rows in the timesheet weekly view, when all
+   * the timesheet's projects are blocked.
+   */
+  public function blockNewRows() {
+    if (isset($this->projects)) {
+      $blocked_projects = $this->getBlockedProjects();
+      if (array_keys($this->projects) == $blocked_projects) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Get projects.
    *
    * @return array
