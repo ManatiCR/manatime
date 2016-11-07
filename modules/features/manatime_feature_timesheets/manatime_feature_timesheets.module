@@ -437,22 +437,9 @@ function manatime_feature_timesheet_make_link_remove_row($node, $id_task) {
  * Helper function to populate the project dropdown.
  */
 function timesheet_get_projects_options($timesheet) {
+  $blocked_nids = $timesheet->getBlockedProjects();
+  $projects = node_load_multiple(array_diff($timesheet->getAllProjects(), $blocked_nids));
   $list = array();
-  $query = new EntityFieldQuery();
-  // Get only active projects with tasks.
-  $result = $query
-    ->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'projects')
-    ->fieldCondition('field_active', 'value', 1, '=')
-    ->fieldCondition('field_tasks', 'target_id', 'NULL', '!=')
-    ->execute();
-  if (isset($result['node'])) {
-    $nids = array_keys($result['node']);
-    // Load only the projects with available tasks, if all the project's tasks
-    // has been reported, the project will be blocked.
-    $blocked_nids = $timesheet->getBlockedProjects();
-    $projects = node_load_multiple(array_diff($nids, $blocked_nids));
-  }
   foreach ($projects as $project) {
     // Get only projects with tasks.
     if (isset($project->field_tasks[LANGUAGE_NONE])) {
@@ -466,13 +453,13 @@ function timesheet_get_projects_options($timesheet) {
  * Helper function to populate the task dropdown.
  */
 function timesheet_get_tasks_options($project_id, $timesheet) {
-  $list = array();
   $nids = array();
   $project = node_load($project_id);
   // Get the ids of tasks.
   foreach ($project->field_tasks[LANGUAGE_NONE] as $nid) {
     $nids[] = $nid['target_id'];
   }
+  $list = array();
   $tasks = node_load_multiple($nids);
   foreach ($tasks as $task) {
     // Get only the tasks not recorded in the reports.

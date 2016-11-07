@@ -206,7 +206,7 @@ class Timesheet {
   public function blockNewRows() {
     if (isset($this->projects)) {
       $blocked_projects = $this->getBlockedProjects();
-      if (array_keys($this->projects) == $blocked_projects) {
+      if ($this->getAllProjects() == $blocked_projects) {
         return TRUE;
       }
     }
@@ -217,10 +217,21 @@ class Timesheet {
    * Get projects.
    *
    * @return array
-   *   All timesheet's projects.
+   *   All projects.
    */
-  public function getProjects() {
-    return $this->projects;
+  public function getAllProjects() {
+    $query = new EntityFieldQuery();
+    // Get only active projects with tasks.
+    $result = $query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'projects')
+      ->fieldCondition('field_active', 'value', 1, '=')
+      ->fieldCondition('field_tasks', 'target_id', 'NULL', '!=')
+      ->execute();
+    if (isset($result['node'])) {
+      return array_keys($result['node']);
+    }
+    return array();
   }
 
   /**
