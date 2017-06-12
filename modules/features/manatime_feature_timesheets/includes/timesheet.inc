@@ -198,13 +198,40 @@ class Timesheet {
   }
 
   /**
+   * Block new rows.
+   *
+   * Block the function to add new rows in the timesheet weekly view, when all
+   * the timesheet's projects are blocked.
+   */
+  public function blockNewRows() {
+    if (isset($this->projects)) {
+      $blocked_projects = $this->getBlockedProjects();
+      if ($this->getAllProjects() == $blocked_projects) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Get projects.
    *
    * @return array
-   *   All timesheet's projects.
+   *   All projects.
    */
-  public function getProjects() {
-    return $this->projects;
+  public function getAllProjects() {
+    $query = new EntityFieldQuery();
+    // Get only active projects with tasks.
+    $result = $query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'projects')
+      ->fieldCondition('field_active', 'value', 1, '=')
+      ->fieldCondition('field_tasks', 'target_id', 'NULL', '!=')
+      ->execute();
+    if (isset($result['node'])) {
+      return array_keys($result['node']);
+    }
+    return array();
   }
 
   /**
@@ -219,9 +246,10 @@ class Timesheet {
    */
   public function getTimeEntriesPerDay($date, $time_entries) {
     $entries = array();
-    foreach ($this->timeEntries as $entry) {
+    foreach ($time_entries as $entry) {
       $entry_date = $entry->field_date[LANGUAGE_NONE][0]['value'];
       $entry_date = date('Y-m-d', strtotime($entry_date));
+      $date = date('Y-m-d', strtotime($date));
       if ($entry_date === $date) {
         $entries[] = $entry;
       }
