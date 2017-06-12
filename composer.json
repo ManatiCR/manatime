@@ -4,6 +4,9 @@
     "wikimedia/composer-merge-plugin": "dev-master",
     "drush/drush": "7.2.0"
   },
+  "config": {
+    "vendor-dir": ".vendor"
+  },
   "extra": {
     "merge-plugin": {
       "include": [
@@ -18,5 +21,10 @@
     "drupal/drupal-extension": "3.1.5",
     "drupal/drupal-driver": "1.1.5",
     "behat/behat": "3.0.15"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "cd .vendor/drush/drush ; composer install"
+    ]
   }
 }

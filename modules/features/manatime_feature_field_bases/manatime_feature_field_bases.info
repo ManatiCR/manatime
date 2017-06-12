@@ -3,6 +3,7 @@ core = 7.x
 package = manatime
 version = 7.x-1.4
 dependencies[] = date
+dependencies[] = date_popup
 dependencies[] = entityreference
 dependencies[] = features
 dependencies[] = list

@@ -1,0 +1,19 @@
+<?php
+/**
+ * @file
+ * Code for the Manatime reports feature feature.
+ */
+
+include_once 'manatime_feature_reports.features.inc';
+
+/**
+ * Implements hook_permission().
+ */
+function manatime_feature_reports_permission() {
+  return array(
+    'See and export reports' => array(
+      'title' => t('See and export reports'),
+      'description' => t('Allow see and export reports.'),
+    ),
+  );
+}

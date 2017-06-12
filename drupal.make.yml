@@ -49,6 +49,8 @@ projects:
     version: "1.2"
   inline_entity_form:
     version: "1.8"
+  jquery_update:
+    version: "2.7"
   libraries:
     version: "2.3"
   link:
@@ -77,6 +79,10 @@ projects:
     version: "3.14"
   views_bulk_operations:
     version: "3.3"
+  views_data_export:
+    version: "3.1"
+  views_pdf:
+    version: "1.5"
   # Themes.
   adminimal_theme:
     version: "1.24"
@@ -90,3 +96,15 @@ libraries:
     download:
       type: "file"
       url: "http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.5.4/ckeditor_4.5.4_standard.zip"
+  tcpdf:
+    download:
+      type: "git"
+      url: "https://github.com/tecnickcom/TCPDF.git"
+      directory_name: "tcpdf"
+      branch: "master"
+      revision: "009f2304c3a9c8152b89a5321a8825f250911dc3"
+  fpdi:
+    download:
+      type: "file"
+      url: "https://www.setasign.com/downloads/103845/FPDI-1.6.1.zip"
+      directory_name: "fpdi"

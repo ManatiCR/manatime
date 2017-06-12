@@ -2,7 +2,7 @@
   "name": "manatime",
   "private": true,
   "devDependencies": {
-    "aquifer": "^0.1.2",
+    "aquifer": "aquifer/aquifer#42d0e8d",
     "breakpoint-sass": "^2.7.0",
     "browser-sync": "^2.13.0",
     "eyeglass": "^0.8.3",
