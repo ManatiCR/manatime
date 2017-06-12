@@ -90,6 +90,40 @@ class Timesheet {
   }
 
   /**
+   * Add time_entry.
+   */
+  public function addTimeEntry($description, $duration, $project_id, $task_id, $date) {
+    global $user;
+    $entity = entity_create('node', array('type' => 'time_entries'));
+    $entity->uid = $user->uid;
+    $wrapper = entity_metadata_wrapper('node', $entity);
+    $wrapper->title = 'time_entry';
+    $wrapper->body->value = $description;
+    $wrapper->field_duration = $duration;
+    $wrapper->field_project = $project_id;
+    $wrapper->field_task = $task_id;
+    $wrapper->field_date->value = $date;
+    $wrapper->field_date->value2 = $date;
+    $wrapper->save();
+    $this->node->field_time_entries[LANGUAGE_NONE][] = array(
+      'target_id' => $wrapper->getIdentifier(),
+    );
+    node_save($this->node);
+    $this->fillTimeEntries();
+    $this->fillProjects();
+  }
+
+  /**
+   * Edit time_entry.
+   */
+  public function editTimeEntry($entry, $description, $duration) {
+    $wrapper = entity_metadata_wrapper('node', $entry);
+    $wrapper->body->value = $description;
+    $wrapper->field_duration = $duration;
+    $wrapper->save();
+  }
+
+  /**
    * Get time_entries.
    *
    * @return array
@@ -97,6 +131,26 @@ class Timesheet {
    */
   public function getTimeEntries() {
     return $this->timeEntries;
+  }
+
+  /**
+   * Get time_entries array.
+   *
+   * @return array
+   *   The timesheet's time entries array.
+   */
+  public function getTimeEntriesArray($time_entries) {
+    $time_entries_array = array();
+    foreach ($time_entries as $time_entry) {
+      $time_entry = entity_metadata_wrapper('node', $time_entry);
+      $time_entries_array[] = array(
+        'project' => $time_entry->field_project->label(),
+        'task' => $time_entry->field_task->label(),
+        'description' => $time_entry->body->value->value(),
+        'duration' => $time_entry->field_duration->value(),
+      );
+    }
+    return $time_entries_array;
   }
 
   /**
@@ -144,13 +198,40 @@ class Timesheet {
   }
 
   /**
+   * Block new rows.
+   *
+   * Block the function to add new rows in the timesheet weekly view, when all
+   * the timesheet's projects are blocked.
+   */
+  public function blockNewRows() {
+    if (isset($this->projects)) {
+      $blocked_projects = $this->getBlockedProjects();
+      if ($this->getAllProjects() == $blocked_projects) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Get projects.
    *
    * @return array
-   *   All timesheet's projects.
+   *   All projects.
    */
-  public function getProjects() {
-    return $this->projects;
+  public function getAllProjects() {
+    $query = new EntityFieldQuery();
+    // Get only active projects with tasks.
+    $result = $query
+      ->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'projects')
+      ->fieldCondition('field_active', 'value', 1, '=')
+      ->fieldCondition('field_tasks', 'target_id', 'NULL', '!=')
+      ->execute();
+    if (isset($result['node'])) {
+      return array_keys($result['node']);
+    }
+    return array();
   }
 
   /**
@@ -163,10 +244,13 @@ class Timesheet {
    * @return array
    *   Only entries with a date equal to $date value.
    */
-  public function getTimeEntriesPerDay($date) {
+  public function getTimeEntriesPerDay($date, $time_entries) {
     $entries = array();
-    foreach ($this->timeEntries as $entry) {
-      if ($entry->field_date[LANGUAGE_NONE][0]['value'] === $date) {
+    foreach ($time_entries as $entry) {
+      $entry_date = $entry->field_date[LANGUAGE_NONE][0]['value'];
+      $entry_date = date('Y-m-d', strtotime($entry_date));
+      $date = date('Y-m-d', strtotime($date));
+      if ($entry_date === $date) {
         $entries[] = $entry;
       }
     }
@@ -224,6 +308,7 @@ class Timesheet {
    *   Only tasks with a project's id equal to $id_project value.
    */
   public function getTasksPerProject($id_project) {
+    $this->fillTimeEntries();
     $node = node_load($id_project);
     $list_tasks = $node->field_tasks[LANGUAGE_NONE];
     $nids = array();
@@ -243,40 +328,101 @@ class Timesheet {
    */
   public function generateRecords() {
     $this->records = array();
-    $this->fillTimeEntries();
     foreach ($this->projects as $project) {
       $tasks = $this->getTasksPerProject($project->nid);
       // Get the tasks of this project.
       foreach ($tasks as $task) {
-        $record_entries = array();
-        $time_entries = $this->getTimeEntriesPerTask($task->nid);
-        // Get the entries of this task.
-        $total_hours_worked = 0;
-        foreach ($time_entries as $time_entry) {
-          $record_entry = array(
-            'description' => t('@duration hrs @description', array(
-              '@duration' => $time_entry->field_duration[LANGUAGE_NONE][0]['value'],
-              '@description' => $time_entry->body[LANGUAGE_NONE][0]['value'],
-            )),
-            'duration' => $time_entry->field_duration[LANGUAGE_NONE][0]['value'],
-          );
-          $total_hours_worked += $time_entry->field_duration[LANGUAGE_NONE][0]['value'];
-          // Get the number day.
-          $timestamp = strtotime($time_entry->field_date[LANGUAGE_NONE][0]['value']);
-          $number_day = date('N', $timestamp);
-          if (isset($record_entries[$number_day])) {
-            $record_entries[$number_day][0]['duration'] += check_plain($record_entry['duration']);
-            $record_entries[$number_day][0]['description'] = check_plain($record_entries[$number_day][0]['description'] . ' ' . $record_entry['description']);
-          }
-          else {
-            $record_entries[$number_day] = array();
-            array_push($record_entries[$number_day], $record_entry);
-          }
-        }
-        $remove_link_row = manatime_feature_timesheet_make_link_remove_row($this->node, $task->nid);
-        $this->addRecord($project->title, $task->title, $record_entries, $total_hours_worked, $remove_link_row);
+        $task_entries = $this->getTimeEntriesPerTask($task->nid);
+        $hours_worked = $this->getHoursWorked($task_entries);
+        $remove_link_row = manatime_feature_timesheet_make_link_remove_row($this->node,
+        $task->nid);
+        $this->addRecord($project, $task, $task_entries,
+        $hours_worked, $remove_link_row);
       }
     }
+  }
+
+  /**
+   * Returns the task's entries separate per day.
+   *
+   * @param string $project
+   *   A object type project.
+   * @param string $task
+   *   A object type task.
+   * @param int $task_entries
+   *   An array with the task's time entries.
+   */
+  public function getTaskEntriesPerDays($project, $task, $task_entries) {
+    $record_entries = array();
+    foreach ($this->getTimesheetDays() as $date) {
+      $day_entries = $this->getTimeEntriesPerDay($date, $task_entries);
+      // The day's time entry.
+      if (!empty($day_entries)) {
+        $entry = reset($day_entries);
+        $text_title = check_plain($entry->body[LANGUAGE_NONE][0]['value']);
+        $text_link = check_plain($entry->field_duration[LANGUAGE_NONE][0]['value']);
+        $parameters = array(
+          'time_entry_id' => $entry->nid,
+        );
+        $link_entry = manatime_feature_timesheet_modal_entry_link($this->node,
+        $parameters, $text_link, $text_title);
+      }
+      else {
+        $parameters = array(
+          'project_id' => $project->nid,
+          'task_id' => $task->nid,
+          'date' => check_plain(strtotime($date)),
+        );
+        $link_entry = manatime_feature_timesheet_modal_entry_link($this->node,
+        $parameters);
+      }
+      $record_entries[] = $link_entry;
+    }
+    return $record_entries;
+  }
+
+  /**
+   * Return array with the timesheet's dates.
+   *
+   * @return array
+   *   The timesheet's dates.
+   */
+  public function getTimesheetDays() {
+    $timesheet_days = array();
+    $beginning = $this->node->field_date['und'][0]['value'];
+    $end = $this->node->field_date['und'][0]['value2'];
+    for ($date = $beginning; $date <= $end;
+      $date = date("Y-m-d H:i:s", strtotime($date . "+ 1 days"))) {
+      $day_name = date("l", strtotime($date));
+      $timesheet_days[$day_name] = date("Y-m-d H:i:s", strtotime($date));
+    }
+    return $timesheet_days;
+  }
+
+  /**
+   * Return an array with the headers of the timesheet view.
+   */
+  public function getTimesheetViewHeaders() {
+    $table_headers = array();
+    $table_headers[] = t('Description');
+    $day_names = array_keys($this->getTimesheetDays());
+    foreach ($day_names as $day_name) {
+      $table_headers[] = t('@dayname', array('@dayname' => $day_name));
+    }
+    $table_headers[] = t('Total');
+    return $table_headers;
+  }
+
+  /**
+   * Return the links for the daily view navegation.
+   */
+  public function getTimesheetDaysLinks() {
+    $day_links = array();
+    foreach ($this->getTimesheetDays() as $dayname => $day) {
+      $day = date("Ymd", strtotime($day));
+      $day_links[] = $previous_timesheet = l(t('@dayname', array('@dayname' => $dayname)), 'timesheet/daily/' . $day);
+    }
+    return $day_links;
   }
 
   /**
@@ -305,9 +451,9 @@ class Timesheet {
    */
   public function addRecord($project, $task, $time_entries, $total_hours_worked, $remove_link_row) {
     $this->records[] = array(
-      'project' => check_plain($project),
-      'task' => check_plain($task),
-      'time_entries' => $time_entries,
+      'project' => check_plain($project->title),
+      'task' => check_plain($task->title),
+      'time_entries' => $this->getTaskEntriesPerDays($project, $task, $time_entries),
       'total_hours_worked' => check_plain($total_hours_worked),
       'remove_link_row' => $remove_link_row,
     );
@@ -328,6 +474,23 @@ class Timesheet {
     if (!empty($nids)) {
       node_delete_multiple($nids);
     }
+  }
+
+  /**
+   * Get time_entries per task.
+   *
+   * @param array $time_entries
+   *   The time entries to consult.
+   *
+   * @return array
+   *   The total hours worked.
+   */
+  public function getHoursWorked($time_entries) {
+    $hours_worked = 0;
+    foreach ($time_entries as $entry) {
+      $hours_worked += $entry->field_duration[LANGUAGE_NONE][0]['value'];
+    }
+    return $hours_worked;
   }
 
   /**

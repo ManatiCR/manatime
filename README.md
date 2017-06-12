@@ -32,6 +32,11 @@ Prepare the local site:
 * `composer install`
 * `cd .vendor/drush/drush ; composer install`
 * `npm install`
+
+Create local settings files:
+
+* `./scripts/local_settings.sh`
+
 * `node_modules/.bin/aquifer extensions-load`
 * `node_modules/.bin/aquifer build`
 
@@ -43,10 +48,6 @@ Prepare for local development:
 * [Mac/Linux only] Install Ansible Galaxy roles required for this VM: `sudo ansible-galaxy install -r provisioning/requirements.yml --force`
 
 * `vagrant up`
-
-Create local settings files:
-
-* `./scripts/local_settings.sh`
 
 Configure Solr search (adapted from
   [Solr for Drupal Developers](http://www.midwesternmac.com/blogs/jeff-geerling/solr-drupal-developers-part-3)):
