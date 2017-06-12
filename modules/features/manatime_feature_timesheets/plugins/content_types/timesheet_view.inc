@@ -26,6 +26,7 @@ function timesheet_view_render($subtype, $conf, $panel_args, $context) {
     $node = $context[0]->data;
     $timesheet = new Timesheet($node);
     $timesheet->generateRecords();
+    $table_headers = $timesheet->getTimesheetViewHeaders();
     $records = $timesheet->getRecords();
     // Build the content type block.
     $block = new stdClass();
@@ -34,6 +35,7 @@ function timesheet_view_render($subtype, $conf, $panel_args, $context) {
       'content' => array(
         '#theme' => 'timesheet-view',
         '#timesheet_id' => $node->nid,
+        '#table_headers' => $table_headers,
         '#records' => $records,
         '#add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
         '#submit_link' => manatime_feature_timesheet_make_submit_link($node),

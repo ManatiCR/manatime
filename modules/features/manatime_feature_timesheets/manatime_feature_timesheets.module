@@ -21,6 +21,14 @@ function manatime_feature_timesheets_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['timesheet/modal-time-entry-form/%node/%ctools_js'] = array(
+    'page callback' => 'manatime_feature_timesheets_modal_time_entry_callback',
+    'page arguments' => array(2, 3),
+    'access callback' => 'manatime_feature_timesheet_validate_user',
+    'access arguments' => array(2),
+    'type' => MENU_CALLBACK,
+  );
+
   $items['timesheet/remove-row-form/%node/%/%ctools_js'] = array(
     'page callback' => 'manatime_feature_timesheets_remove_row_callback',
     'page arguments' => array(2, 3, 4),
@@ -54,7 +62,7 @@ function manatime_feature_timesheets_menu() {
  */
 function manatime_feature_timesheet_validate_user($node) {
   global $user;
-  return $node->uid === $user->uid;
+  return $node->field_user[LANGUAGE_NONE][0]['target_id'] === $user->uid;
 }
 
 /**
@@ -223,6 +231,7 @@ function manatime_feature_timesheets_theme() {
     'timesheet-view' => array(
       'variables' => array(
         'timesheet_id' => '',
+        'table_headers' => array(),
         'records' => array(),
         'add_row_link' => '',
         'submit_link' => '',
@@ -279,6 +288,96 @@ function manatime_feature_timesheets_add_row_form($form, &$form_state, $node) {
     '#value' => t('Add'),
   );
   return $form;
+}
+
+/**
+ * Form time entry.
+ */
+function manatime_feature_timesheets_time_entry_form($form, &$form_state, $node) {
+  $query = drupal_get_query_parameters();
+  $entry = !empty($query['time_entry_id']) ? node_load($query['time_entry_id']) : NULL;
+
+  $form['duration'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Duration'),
+    '#size' => 60,
+    '#required' => TRUE,
+    '#default_value' => !is_null($entry) ? $entry->field_duration[LANGUAGE_NONE][0]['value'] : '',
+  );
+
+  $form['description'] = array(
+    '#title' => t('Description'),
+    '#type' => 'textarea',
+    '#required' => TRUE,
+    '#default_value' => !is_null($entry) ? $entry->body[LANGUAGE_NONE][0]['value'] : '',
+  );
+
+  $form['node'] = array(
+    "#type" => 'value',
+    "#value" => $node,
+  );
+
+  $form['actions'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'class' => array('form-actions'),
+    ),
+  );
+
+  if (is_null($entry)) {
+    $form['project'] = array(
+      "#type" => 'value',
+      "#value" => $query['project_id'],
+    );
+
+    $form['task'] = array(
+      "#type" => 'value',
+      "#value" => $query['task_id'],
+    );
+
+    $form['date'] = array(
+      "#type" => 'value',
+      "#value" => $query['date'],
+    );
+
+    $form['actions']['add'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add'),
+    );
+  }
+  else {
+    $form['entry'] = array(
+      "#type" => 'value',
+      "#value" => $entry,
+    );
+
+    $form['actions']['edit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Edit'),
+    );
+
+    $form['actions']['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+    );
+  }
+  return $form;
+}
+
+/**
+ * Form time entry's validation.
+ */
+function manatime_feature_timesheets_time_entry_form_validate($form, &$form_state) {
+  if (empty($form['duration']['#value'])) {
+    form_set_error('duration', t("Duration is required."));
+  }
+  elseif (!is_numeric($form['duration']['#value'])) {
+    form_set_error('duration', t("The field duration only accept numbers."));
+  }
+
+  if (empty($form['description']['#value'])) {
+    form_set_error('duration', t("Description is required."));
+  }
 }
 
 /**
@@ -342,6 +441,24 @@ function manatime_feature_timesheet_make_link_add_row($node) {
   if ($node->status == NODE_NOT_PUBLISHED) {
     return l(t('Add row'), 'timesheet/add-new-form/' . $node->nid . '/nojs', array('attributes' => array('class' => 'ctools-use-modal')));
   }
+}
+
+/**
+ * Helper function to make a link time entry.
+ */
+function manatime_feature_timesheet_modal_entry_link($node, $parameters, $text_link = 'Add', $text_title = '') {
+  ctools_include('modal');
+  ctools_modal_add_js();
+  if ($node->status == NODE_NOT_PUBLISHED) {
+    $path = 'timesheet/modal-time-entry-form/' . $node->nid . '/nojs';
+    return l($text_link, $path, array(
+      'attributes' => array(
+        'class' => 'ctools-use-modal',
+        'title' => $text_title,
+      ), 'query' => $parameters,
+    ));
+  }
+  return $text_link = is_numeric($text_link) ? $text_link : '';
 }
 
 /**
@@ -450,6 +567,40 @@ function manatime_feature_timesheets_add_row_callback($node, $ajax) {
 }
 
 /**
+ * Ajax menu callback - Add row.
+ */
+function manatime_feature_timesheets_modal_time_entry_callback($node, $ajax) {
+  if ($ajax) {
+    ctools_include('ajax');
+    ctools_include('modal');
+
+    $form_state = array(
+      'ajax' => TRUE,
+      'title' => t('time entry'),
+    );
+
+    $form_state['build_info']['args'] = array($node);
+
+    // Use ctools to generate ajax instructions for the browser to create
+    // a form in a modal popup.
+    $output = ctools_modal_form_wrapper('manatime_feature_timesheets_time_entry_form', $form_state);
+
+    // If the form has been submitted, there may be additional instructions
+    // such as dismissing the modal popup.
+    if (!empty($form_state['ajax_commands'])) {
+      $output = $form_state['ajax_commands'];
+    }
+
+    // Return the ajax instructions to the browser via ajax_render().
+    print ajax_render($output);
+    drupal_exit();
+  }
+  else {
+    return drupal_get_form('manatime_feature_timesheets_time_entry_form', $node);
+  }
+}
+
+/**
  * Ajax menu callback - Remove row.
  */
 function manatime_feature_timesheets_remove_row_callback($node, $task_id, $ajax) {
@@ -529,18 +680,62 @@ function manatime_feature_timesheets_add_row_form_submit(&$form, &$form_state) {
   $node = $form_state['values']['node'];
   $timesheet = new Timesheet($node);
   $timesheet->generateRecords();
-  $project = entity_metadata_wrapper('node', $form_state['complete form']['project']['#value']);
-  $task = entity_metadata_wrapper('node', $form_state['complete form']['task']['#value']);
+  $project = node_load($form_state['values']['project']);
+  $task = node_load($form_state['values']['task']);
   // Add new row.
-  $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->getIdentifier());
-  $timesheet->addRecord($project->label(), $task->label(), array(), 0, $remove_link_row);
+  $remove_link_row = manatime_feature_timesheet_make_link_remove_row($node, $task->nid);
 
+  $timesheet->addRecord($project, $task, array(), 0, $remove_link_row);
+  $table_headers = $timesheet->getTimesheetViewHeaders();
   $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
+    'table_headers' => $table_headers,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
     'submit_link' => manatime_feature_timesheet_make_submit_link($node),
+  );
+  $markup = theme('timesheet-view', $variables);
+  // Tell the browser to close the modal.
+  $form_state['ajax_commands'][] = ctools_modal_command_dismiss();
+  // Tell the browser to replace the old link with the new one.
+  $form_state['ajax_commands'][] = ajax_command_replace('#time-entries-main', $markup);
+}
+
+/**
+ * Drupal form submit handler - Time entry.
+ */
+function manatime_feature_timesheets_time_entry_form_submit(&$form, &$form_state) {
+  $node = $form_state['values']['node'];
+  $timesheet = new Timesheet($node);
+  $description = $form_state['values']['description'];
+  $duration = $form_state['values']['duration'];
+  $timesheet->generateRecords();
+
+  if ($form_state['triggering_element']['#value'] === 'Delete') {
+    $entry = $form_state['values']['entry'];
+    node_delete($entry->nid);
+  }
+
+  elseif ($form_state['triggering_element']['#value'] === 'Add') {
+    $project_id = $form_state['values']['project'];
+    $task_id = $form_state['values']['task'];
+    $date = $form_state['values']['date'];
+    $timesheet->addTimeEntry($description, $duration, $project_id, $task_id, $date);
+  }
+
+  elseif ($form_state['triggering_element']['#value'] === 'Edit') {
+    $timesheet->editTimeEntry($form_state['values']['entry'], $description, $duration);
+  }
+
+  $timesheet->generateRecords();
+  $table_headers = $timesheet->getTimesheetViewHeaders();
+  $records = $timesheet->getRecords();
+  $variables = array(
+    'timesheet_id' => $node->nid,
+    'table_headers' => $table_headers,
+    'records' => $records,
+    'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
   );
   $markup = theme('timesheet-view', $variables);
   // Tell the browser to close the modal.
@@ -559,8 +754,13 @@ function manatime_feature_timesheets_remove_row_form_submit(&$form, &$form_state
   $timesheet->removeRecord($form_state['build_info']['args'][1]);
   $timesheet->generateRecords();
   $records = $timesheet->getRecords();
+
+  $timesheet->generateRecords();
+  $table_headers = $timesheet->getTimesheetViewHeaders();
+  $records = $timesheet->getRecords();
   $variables = array(
     'timesheet_id' => $node->nid,
+    'table_headers' => $table_headers,
     'records' => $records,
     'add_row_link' => manatime_feature_timesheet_make_link_add_row($node),
     'submit_link' => manatime_feature_timesheet_make_submit_link($node),

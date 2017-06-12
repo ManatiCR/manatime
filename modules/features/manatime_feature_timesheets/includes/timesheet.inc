@@ -90,6 +90,40 @@ class Timesheet {
   }
 
   /**
+   * Add time_entry.
+   */
+  public function addTimeEntry($description, $duration, $project_id, $task_id, $date) {
+    global $user;
+    $entity = entity_create('node', array('type' => 'time_entries'));
+    $entity->uid = $user->uid;
+    $wrapper = entity_metadata_wrapper('node', $entity);
+    $wrapper->title = 'time_entry';
+    $wrapper->body->value = $description;
+    $wrapper->field_duration = $duration;
+    $wrapper->field_project = $project_id;
+    $wrapper->field_task = $task_id;
+    $wrapper->field_date->value = $date;
+    $wrapper->field_date->value2 = $date;
+    $wrapper->save();
+    $this->node->field_time_entries[LANGUAGE_NONE][] = array(
+      'target_id' => $wrapper->getIdentifier(),
+    );
+    node_save($this->node);
+    $this->fillTimeEntries();
+    $this->fillProjects();
+  }
+
+  /**
+   * Edit time_entry.
+   */
+  public function editTimeEntry($entry, $description, $duration) {
+    $wrapper = entity_metadata_wrapper('node', $entry);
+    $wrapper->body->value = $description;
+    $wrapper->field_duration = $duration;
+    $wrapper->save();
+  }
+
+  /**
    * Get time_entries.
    *
    * @return array
@@ -183,7 +217,7 @@ class Timesheet {
    * @return array
    *   Only entries with a date equal to $date value.
    */
-  public function getTimeEntriesPerDay($date) {
+  public function getTimeEntriesPerDay($date, $time_entries) {
     $entries = array();
     foreach ($this->timeEntries as $entry) {
       $entry_date = $entry->field_date[LANGUAGE_NONE][0]['value'];
@@ -246,6 +280,7 @@ class Timesheet {
    *   Only tasks with a project's id equal to $id_project value.
    */
   public function getTasksPerProject($id_project) {
+    $this->fillTimeEntries();
     $node = node_load($id_project);
     $list_tasks = $node->field_tasks[LANGUAGE_NONE];
     $nids = array();
@@ -265,40 +300,57 @@ class Timesheet {
    */
   public function generateRecords() {
     $this->records = array();
-    $this->fillTimeEntries();
     foreach ($this->projects as $project) {
       $tasks = $this->getTasksPerProject($project->nid);
       // Get the tasks of this project.
       foreach ($tasks as $task) {
-        $record_entries = array();
-        $time_entries = $this->getTimeEntriesPerTask($task->nid);
-        // Get the entries of this task.
-        $total_hours_worked = 0;
-        foreach ($time_entries as $time_entry) {
-          $record_entry = array(
-            'description' => t('@duration hrs @description', array(
-              '@duration' => $time_entry->field_duration[LANGUAGE_NONE][0]['value'],
-              '@description' => $time_entry->body[LANGUAGE_NONE][0]['value'],
-            )),
-            'duration' => $time_entry->field_duration[LANGUAGE_NONE][0]['value'],
-          );
-          $total_hours_worked += $time_entry->field_duration[LANGUAGE_NONE][0]['value'];
-          // Get the number day.
-          $timestamp = strtotime($time_entry->field_date[LANGUAGE_NONE][0]['value']);
-          $number_day = date('N', $timestamp);
-          if (isset($record_entries[$number_day])) {
-            $record_entries[$number_day][0]['duration'] += check_plain($record_entry['duration']);
-            $record_entries[$number_day][0]['description'] = check_plain($record_entries[$number_day][0]['description'] . ' ' . $record_entry['description']);
-          }
-          else {
-            $record_entries[$number_day] = array();
-            array_push($record_entries[$number_day], $record_entry);
-          }
-        }
-        $remove_link_row = manatime_feature_timesheet_make_link_remove_row($this->node, $task->nid);
-        $this->addRecord($project->title, $task->title, $record_entries, $total_hours_worked, $remove_link_row);
+        $task_entries = $this->getTimeEntriesPerTask($task->nid);
+        $hours_worked = $this->getHoursWorked($task_entries);
+        $remove_link_row = manatime_feature_timesheet_make_link_remove_row($this->node,
+        $task->nid);
+        $this->addRecord($project, $task, $task_entries,
+        $hours_worked, $remove_link_row);
       }
     }
+  }
+
+  /**
+   * Returns the task's entries separate per day.
+   *
+   * @param string $project
+   *   A object type project.
+   * @param string $task
+   *   A object type task.
+   * @param int $task_entries
+   *   An array with the task's time entries.
+   */
+  public function getTaskEntriesPerDays($project, $task, $task_entries) {
+    $record_entries = array();
+    foreach ($this->getTimesheetDays() as $date) {
+      $day_entries = $this->getTimeEntriesPerDay($date, $task_entries);
+      // The day's time entry.
+      if (!empty($day_entries)) {
+        $entry = reset($day_entries);
+        $text_title = check_plain($entry->body[LANGUAGE_NONE][0]['value']);
+        $text_link = check_plain($entry->field_duration[LANGUAGE_NONE][0]['value']);
+        $parameters = array(
+          'time_entry_id' => $entry->nid,
+        );
+        $link_entry = manatime_feature_timesheet_modal_entry_link($this->node,
+        $parameters, $text_link, $text_title);
+      }
+      else {
+        $parameters = array(
+          'project_id' => $project->nid,
+          'task_id' => $task->nid,
+          'date' => check_plain(strtotime($date)),
+        );
+        $link_entry = manatime_feature_timesheet_modal_entry_link($this->node,
+        $parameters);
+      }
+      $record_entries[] = $link_entry;
+    }
+    return $record_entries;
   }
 
   /**
@@ -317,6 +369,20 @@ class Timesheet {
       $timesheet_days[$day_name] = date("Y-m-d H:i:s", strtotime($date));
     }
     return $timesheet_days;
+  }
+
+  /**
+   * Return an array with the headers of the timesheet view.
+   */
+  public function getTimesheetViewHeaders() {
+    $table_headers = array();
+    $table_headers[] = t('Description');
+    $day_names = array_keys($this->getTimesheetDays());
+    foreach ($day_names as $day_name) {
+      $table_headers[] = t('@dayname', array('@dayname' => $day_name));
+    }
+    $table_headers[] = t('Total');
+    return $table_headers;
   }
 
   /**
@@ -357,9 +423,9 @@ class Timesheet {
    */
   public function addRecord($project, $task, $time_entries, $total_hours_worked, $remove_link_row) {
     $this->records[] = array(
-      'project' => check_plain($project),
-      'task' => check_plain($task),
-      'time_entries' => $time_entries,
+      'project' => check_plain($project->title),
+      'task' => check_plain($task->title),
+      'time_entries' => $this->getTaskEntriesPerDays($project, $task, $time_entries),
       'total_hours_worked' => check_plain($total_hours_worked),
       'remove_link_row' => $remove_link_row,
     );
