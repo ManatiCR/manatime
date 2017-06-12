@@ -55,4 +55,5 @@
        </table>
      <?php endif; ?>
    <?php print $add_row_link; ?>
+   <?php print $submit_link;?>
  </main>

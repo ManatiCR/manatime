@@ -383,6 +383,23 @@ class Timesheet {
   }
 
   /**
+   * Get time_entries per task.
+   *
+   * @param array $time_entries
+   *   The time entries to consult.
+   *
+   * @return array
+   *   The total hours worked.
+   */
+  public function getHoursWorked($time_entries) {
+    $hours_worked = 0;
+    foreach ($time_entries as $entry) {
+      $hours_worked += $entry->field_duration[LANGUAGE_NONE][0]['value'];
+    }
+    return $hours_worked;
+  }
+
+  /**
    * Timesheet submit.
    */
   public function submit() {
