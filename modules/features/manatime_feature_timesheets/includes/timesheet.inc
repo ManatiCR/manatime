@@ -400,6 +400,20 @@ class Timesheet {
   }
 
   /**
+   * Return an array with the headers of the timesheet view.
+   */
+  public function getTimesheetViewHeaders() {
+    $table_headers = array();
+    $table_headers[] = t('Description');
+    $day_names = array_keys($this->getTimesheetDays());
+    foreach ($day_names as $day_name) {
+      $table_headers[] = t('@dayname', array('@dayname' => $day_name));
+    }
+    $table_headers[] = t('Total');
+    return $table_headers;
+  }
+
+  /**
    * Return the links for the daily view navegation.
    */
   public function getTimesheetDaysLinks() {
